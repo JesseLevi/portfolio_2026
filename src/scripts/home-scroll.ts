@@ -22,6 +22,10 @@ const LOOP_QUERY =
   '(pointer: fine) and (prefers-reduced-motion: no-preference)';
 /** Terugval voor browsers zonder `scrollend`. */
 const SCROLL_IDLE_MS = 150;
+/** Wielafstand voorbij de laatste titel (deel van de viewporthoogte) voor de lus. */
+const BRIDGE_THRESHOLD = 0.35;
+/** Pauze in de wielinvoer (ms) waarna de opgetelde afstand vervalt. */
+const BRIDGE_RESET_MS = 400;
 
 export interface HomeItem {
   index: number;
@@ -207,19 +211,37 @@ function enableLoop(): (restore: boolean) => void {
     window.scrollTo({ top: Math.max(0, y - start), behavior: 'instant' });
   };
   // Van de laatste titel naar de kopie-intro is één scherm (intro + titel). Eén
-  // wieltik haalt de halve afstand niet, en dan snapt de browser terug. Zodra
-  // een tik omlaag voorbij de laatste titel komt, scrollen we zelf door naar de
-  // kopie. (Bij het event staat scrollY al na de tik; vandaar >= i.p.v. ===.)
+  // wieltik haalt de halve afstand niet, en dan snapt de browser terug. Daarom
+  // scrollen we zelf door naar de kopie, maar pas als de wielafstand omlaag
+  // voorbij de laatste titel de drempel haalt: zo snapt de laatste case niet
+  // bij de eerste tik al weg. (Bij het event staat scrollY al na de tik; vandaar
+  // >= i.p.v. ===.)
   let bridging = false;
+  let pull = 0;
+  let lastWheel = 0;
   const onWheel = (e: WheelEvent) => {
-    if (bridging || e.deltaY <= 0 || e.ctrlKey) return;
+    if (bridging || e.ctrlKey) return;
     const lastTitle = getItems().at(-1)?.title;
     if (!lastTitle) return;
     const lastSnap =
       lastTitle.getBoundingClientRect().top + window.scrollY - snapLine();
     const start = clone.getBoundingClientRect().top + window.scrollY;
     const y = window.scrollY;
-    if (y < lastSnap - 2 || y >= start - 2) return;
+    if (e.deltaY <= 0 || y < lastSnap - 2 || y >= start - 2) {
+      pull = 0;
+      return;
+    }
+    if (e.timeStamp - lastWheel > BRIDGE_RESET_MS) pull = 0;
+    lastWheel = e.timeStamp;
+    const unit =
+      e.deltaMode === WheelEvent.DOM_DELTA_LINE
+        ? 16
+        : e.deltaMode === WheelEvent.DOM_DELTA_PAGE
+          ? window.innerHeight
+          : 1;
+    pull += e.deltaY * unit;
+    if (pull < window.innerHeight * BRIDGE_THRESHOLD) return;
+    pull = 0;
     bridging = true;
     window.scrollTo({ top: start, behavior: 'smooth' });
   };
