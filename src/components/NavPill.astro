@@ -30,7 +30,7 @@ const items: {
   data-nav-pill
   aria-label={t('nav.label', locale)}
   transition:persist
-  style="--nav-ease: cubic-bezier(0.22, 1, 0.36, 1); bottom: var(--nav-pill-bottom);"
+  style="--nav-ease: cubic-bezier(0.22, 1, 0.36, 1); bottom: var(--nav-pill-bottom); transform: translateY(var(--nav-pill-y, 0px));"
   class="fixed left-1/2 z-50 -translate-x-1/2 [--nav-pill-bottom:24px] md:[--nav-pill-bottom:40px]"
 >
   <div class="shadow-pill bg-paper relative h-12 rounded-full p-2">
@@ -70,4 +70,17 @@ const items: {
 
 <script>
   import '../scripts/nav-pill.ts';
+  import '../scripts/case-nav.ts';
+</script>
+
+<!-- Beginpositie op de case-pagina vóór de eerste paint (logica: src/scripts/case-nav.ts). -->
+<script is:inline>
+  (() => {
+    const nav = document.querySelector('[data-nav-pill]');
+    const hero = document.querySelector('[data-case-hero]');
+    if (!nav || !hero || !matchMedia('(min-width: 768px)').matches) return;
+    const b =
+      innerHeight - (hero.getBoundingClientRect().bottom + scrollY) - 24;
+    nav.style.setProperty('--nav-pill-y', `${b > 40 ? -(b - 40) : 0}px`);
+  })();
 </script>
