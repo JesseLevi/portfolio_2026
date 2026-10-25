@@ -1,0 +1,46 @@
+---
+import ScreenshotBlock from '../ScreenshotBlock.astro';
+import type { CaseEntry } from '../../lib/cases';
+
+interface Props {
+  cases: CaseEntry[];
+}
+
+const { cases } = Astro.props;
+const first = cases[0];
+---
+
+<!--
+  Paneel rechts (desktop, sticky 100vh) of vast onderin (mobiel). Alle hero's
+  liggen gestapeld; alleen de actieve is zichtbaar (opacity, zodat #8 kan
+  crossfaden). De kleur komt uit --panel-color; #8 zet die uit data-color.
+  De titel in de lijst is het toetsenbordpad: deze links staan uit de tabvolgorde.
+-->
+<aside
+  class="fixed inset-x-0 bottom-0 z-10 h-(--panel-h) bg-(--panel-color) transition-colors lg:sticky lg:inset-x-auto lg:top-0 lg:z-auto lg:h-svh lg:self-start"
+  style={{ '--panel-color': first?.data.hero.color }}
+  data-case-panel
+>
+  <div class="relative size-full">
+    {cases.map((c, i) => (
+      <a
+        href={`/werk/${c.data.slug}`}
+        tabindex="-1"
+        aria-hidden={i === 0 ? undefined : 'true'}
+        class="absolute inset-0 block opacity-0 transition-opacity duration-300 data-active:opacity-100"
+        data-case={c.data.slug}
+        data-index={i}
+        data-color={c.data.hero.color}
+        data-active={i === 0 ? '' : undefined}
+      >
+        <ScreenshotBlock
+          image={c.data.hero.image}
+          alt={c.data.hero.alt}
+          color="transparent"
+          inset="panel"
+          class="size-full"
+        />
+      </a>
+    ))}
+  </div>
+</aside>
