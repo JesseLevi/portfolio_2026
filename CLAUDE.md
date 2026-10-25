@@ -40,7 +40,7 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 
 ## Werkwijze
 
-- Eén PR per ticket. Jesse geeft de go voor de merge en sluit de issues.
+- Eén PR per ticket. De orchestrator merget (squash) zodra de PR geverifieerd is; Jesse heeft daar volledig mandaat voor gegeven en sluit de issues.
 - Board: `Backlog → Ready → In progress → In review → Done`. Een kaart gaat naar "In progress" vóór de code, en naar "In review" pas als er een PR is. Alleen de orchestrator werkt het board bij.
 - **Af betekent geverifieerd:**
   - `pnpm lint`, `pnpm typecheck` en `pnpm build` zijn groen in CI;
