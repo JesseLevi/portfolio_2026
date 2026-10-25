@@ -48,3 +48,13 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 - Worktrees vertakken van `main`. Draai Playwright-runs na elkaar: parallelle agents delen anders een poort.
 - Controleer met `git status` en `git log` dat er echt gecommit is. Een branch zonder PR is niet "in review".
 - Geen signed commits en geen zware rulesets.
+
+## Commando's
+
+- `pnpm dev`: dev-server.
+- `pnpm build`: statische build naar `dist/`.
+- `pnpm preview`: serveert `dist/` (poort 4329 bij `pnpm screenshot`).
+- `pnpm lint`: ESLint en `prettier --check`.
+- `pnpm format`: Prettier schrijft de opmaak.
+- `pnpm typecheck`: `astro check`.
+- `pnpm screenshot`: Playwright-screenshots (desktop 1440x900, mobiel 402x874) naar `screenshots/<viewport>/<route>.png`. Bouwt niet zelf: draai eerst `pnpm build`. Extra routes via `SCREENSHOT_ROUTES="/,/cases/x"` of de array in `e2e/screenshots.spec.ts`.
