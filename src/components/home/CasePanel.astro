@@ -18,15 +18,17 @@ const first = cases[0];
   overgang naar de case (#13; view-transition-name staat alleen op het actieve
   item, gezet door home-scroll.ts). De titel in de lijst is het toetsenbordpad: deze links staan uit de tabvolgorde.
   Mobiel: het paneel hangt aan de onderkant van 100lvh (de fold), dus ook achter
-  de werkbalk van iOS Safari. De afbeelding centreert in het zichtbare deel
-  (minus 100lvh - 100dvh, de hoogte van die werkbalk).
+  de werkbalk van iOS Safari. De afbeelding centreert in het deel dat ook met
+  uitgeklapte werkbalk zichtbaar is (minus 100lvh - 100svh). Bewust geen dvh:
+  iOS werkt dvh pas na het scrollen bij, en dan verspringt de afbeelding
+  na elke veeg en legt Safari de snap opnieuw.
 -->
 <aside
   class="fixed inset-x-0 top-[calc(100lvh-var(--panel-h))] z-10 h-(--panel-h) bg-(--panel-color) transition-colors lg:sticky lg:inset-x-auto lg:top-0 lg:z-auto lg:h-svh lg:self-start"
   style={{ '--panel-color': first?.data.hero.color }}
   data-case-panel
 >
-  <div class="relative h-[calc(100%-(100lvh-100dvh))] w-full lg:h-full">
+  <div class="relative h-[calc(100%-(100lvh-100svh))] w-full lg:h-full">
     {cases.map((c, i) => (
       <a
         href={`/werk/${c.data.slug}`}

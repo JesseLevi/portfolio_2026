@@ -33,8 +33,6 @@ const LOCK_IDLE_MS = 200;
 const LOCK_RELEASE_PX = 4;
 /** Langste duur van het slot (ms), ook als de wielinvoer doorloopt. */
 const LOCK_MAX_MS = 2000;
-/** Mobiele layout (paneel vast onderin), tot de `lg`-breakpoint. */
-const MOBILE_QUERY = '(max-width: 1023px)';
 
 export interface HomeItem {
   index: number;
@@ -181,8 +179,9 @@ function closestIndex(): number {
  * Eindeloze lus: plaatst een kopie van intro + lijst achter de lijst en springt
  * na het scrollen terug als de kopie de plek van het origineel heeft bereikt.
  * Geeft de opruimfunctie terug (`restore`: eerst naar het origineel springen).
+ * `restoreY`: de scrollpositie die Astro bij het laden herstelde.
  */
-function enableLoop(): (restore: boolean) => void {
+function enableLoop(restoreY?: number): (restore: boolean) => void {
   if (!list || !introEl || !list.parentElement) return () => {};
   const column = list.parentElement;
   const root = document.documentElement;
@@ -203,7 +202,11 @@ function enableLoop(): (restore: boolean) => void {
   for (const a of listCopy.querySelectorAll('a')) {
     a.setAttribute('tabindex', '-1');
   }
-  clone.append(introCopy, listCopy);
+  // Mobiel: een wit vlak boven de kopie dekt de originele titels af zodra de
+  // laatste titel de snaplijn verlaat (CSS-scrollanimatie in index.astro).
+  const veil = document.createElement('div');
+  veil.setAttribute('data-home-loop-veil', '');
+  clone.append(veil, introCopy, listCopy);
   for (const el of clone.querySelectorAll('[data-open-contact]')) {
     el.removeAttribute('data-open-contact');
   }
@@ -214,27 +217,7 @@ function enableLoop(): (restore: boolean) => void {
   root.setAttribute(LOOP_ATTR, '');
   syncCloneActive();
 
-  // Mobiel: boven de kopie-intro horen geen titels. Zodra de laatste titel de
-  // snaplijn verlaat, vervaagt de originele lijst; als de kopie-intro de
-  // snaplijn bereikt (één titelhoogte later) is hij weg.
-  const mobileMq = window.matchMedia(MOBILE_QUERY);
-  const list0 = list;
-  let fadeRaf = 0;
-  const fade = () => {
-    fadeRaf = 0;
-    const range = getItems().at(-1)?.title.offsetHeight ?? 0;
-    const rest = clone.getBoundingClientRect().top - snapLine();
-    const opacity =
-      mobileMq.matches && range > 0
-        ? Math.min(1, Math.max(0, rest / range))
-        : 1;
-    list0.style.opacity = opacity < 1 ? String(opacity) : '';
-  };
-  const onFadeScroll = () => {
-    if (!fadeRaf) fadeRaf = requestAnimationFrame(fade);
-  };
-  window.addEventListener('scroll', onFadeScroll, { passive: true });
-  mobileMq.addEventListener('change', fade);
+  const hasScrollEnd = 'onscrollend' in window;
 
   // Slot tijdens de brug: het wielgebaar dat de brug start loopt door (vingers
   // nog op het trackpad, daarna momentum). Zonder slot duwen die events de
@@ -273,13 +256,29 @@ function enableLoop(): (restore: boolean) => void {
     if (locked) armUnlock();
   };
 
-  /** Spring terug zodra de kopie op de plek van het origineel staat. */
-  const wrap = () => {
+  /** Spring terug als de kopie (deels) op de plek van het origineel staat. */
+  const jump = () => {
     const start = clone.getBoundingClientRect().top + window.scrollY;
     const y = window.scrollY;
     if (y < start - 2) return;
     window.scrollTo({ top: Math.max(0, y - start), behavior: 'instant' });
-    fade(); // direct, anders staat het origineel één frame onzichtbaar
+  };
+  // Touch: nooit springen terwijl er een vinger op het scherm ligt. iOS negeert
+  // de sprong dan of verspringt onder de vinger. Na het loslaten (en het
+  // uitrollen en snappen) volgt `scrollend` of de idle-terugval.
+  let touching = false;
+  const onTouchStart = () => {
+    touching = true;
+  };
+  const onTouchEnd = (e: TouchEvent) => {
+    if (e.touches.length > 0) return;
+    touching = false;
+    // Zonder `scrollend`: staat de pagina al stil (geen scroll-events meer),
+    // dan start alleen het loslaten de timer.
+    if (!hasScrollEnd) onScrollIdle();
+  };
+  const wrap = () => {
+    if (!touching) jump();
   };
   // Van de laatste titel naar de kopie-intro is één scherm (intro + titel). Eén
   // wieltik haalt de halve afstand niet, en dan snapt de browser terug. Daarom
@@ -337,9 +336,20 @@ function enableLoop(): (restore: boolean) => void {
     window.clearTimeout(idle);
     idle = window.setTimeout(onScrollEnd, SCROLL_IDLE_MS);
   };
-  const hasScrollEnd = 'onscrollend' in window;
   if (hasScrollEnd) window.addEventListener('scrollend', onScrollEnd);
   else window.addEventListener('scroll', onScrollIdle, { passive: true });
+  window.addEventListener('touchstart', onTouchStart, { passive: true });
+  window.addEventListener('touchend', onTouchEnd, { passive: true });
+  window.addEventListener('touchcancel', onTouchEnd, { passive: true });
+
+  // Astro herstelt de scrollpositie (herladen, terug in de geschiedenis) vóór
+  // setup() de onderruimte meet, en die meting kan hem afkappen. Zet hem terug
+  // nu de kopie er staat. Ligt hij op de kopie, dan zie je de beginstaat maar
+  // staan de originele titels erboven: spring dan naar het origineel.
+  if (restoreY !== undefined && restoreY !== window.scrollY) {
+    window.scrollTo({ top: restoreY, behavior: 'instant' });
+  }
+  jump();
 
   return (restore) => {
     window.removeEventListener('wheel', onWheel);
@@ -347,12 +357,11 @@ function enableLoop(): (restore: boolean) => void {
     window.removeEventListener('scroll', onScrollIdle);
     window.clearTimeout(idle);
     unlock();
-    window.removeEventListener('scroll', onFadeScroll);
-    mobileMq.removeEventListener('change', fade);
-    cancelAnimationFrame(fadeRaf);
-    list0.style.opacity = '';
+    window.removeEventListener('touchstart', onTouchStart);
+    window.removeEventListener('touchend', onTouchEnd);
+    window.removeEventListener('touchcancel', onTouchEnd);
     // Sta je op de kopie (zelfde beeld), ga dan eerst naar het origineel.
-    if (restore) wrap();
+    if (restore) jump();
     clone.remove();
     cloneTitles = [];
     root.removeAttribute(LOOP_ATTR);
@@ -363,6 +372,7 @@ function setup(): () => void {
   const root = document.documentElement;
   const items = getItems();
   const last = items[items.length - 1]?.title;
+  const restoredY = window.scrollY;
 
   // Introhoogte en hoogte van het laatste item als CSS variables (de intro is op
   // mobiel variabel). Het eerste bepaalt scroll-margin-top, beide samen de
@@ -380,15 +390,16 @@ function setup(): () => void {
   // Lus aan/uit volgens de media query (ook bij wijzigingen tijdens het gebruik).
   const loopMq = window.matchMedia(LOOP_QUERY);
   let disableLoop: ((restore: boolean) => void) | null = null;
-  const syncLoop = () => {
-    if (loopMq.matches && !disableLoop) disableLoop = enableLoop();
+  const syncLoop = (restoreY?: number) => {
+    if (loopMq.matches && !disableLoop) disableLoop = enableLoop(restoreY);
     else if (!loopMq.matches && disableLoop) {
       disableLoop(true);
       disableLoop = null;
     }
   };
-  syncLoop();
-  loopMq.addEventListener('change', syncLoop);
+  syncLoop(restoredY);
+  const onLoopChange = () => syncLoop();
+  loopMq.addEventListener('change', onLoopChange);
 
   const update = () => {
     if (pending === null) setActive(closestIndex());
@@ -457,7 +468,7 @@ function setup(): () => void {
     window.removeEventListener('resize', onScroll);
     currentList?.removeEventListener('focusin', onFocusIn);
     document.removeEventListener('home-leave', onLeave);
-    loopMq.removeEventListener('change', syncLoop);
+    loopMq.removeEventListener('change', onLoopChange);
     disableLoop?.(false);
     disableLoop = null;
     ro.disconnect();
