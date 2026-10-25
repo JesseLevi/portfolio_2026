@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CaseHeader from '../../components/case/CaseHeader.astro';
 import CaseBlock from '../../components/case/CaseBlock.astro';
+import ChapterNav from '../../components/case/ChapterNav.astro';
 import CaseFooter from '../../components/case/CaseFooter.astro';
 import { paragraphs } from '../../components/case/paragraphs';
 import { getCases } from '../../lib/cases';
@@ -51,5 +52,8 @@ const ids = blocks.map((block) => {
       </div>
     </article>
   </main>
+  <ChapterNav
+    chapters={blocks.map((block, i) => ({ id: ids[i]!, name: block.chapter }))}
+  />
   <CaseFooter />
 </BaseLayout>
