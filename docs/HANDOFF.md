@@ -1,11 +1,12 @@
 # Handoff
 
-**Stand (2026-10-25):** gemerged zijn #1–#7, #9 en #12. De site bouwt statisch en deployt via Vercel (project `portfolio-2026`; elke PR krijgt een preview). Home en de case-pagina zijn statisch af en vergeleken met Figma op 1440 en 402. De nav-pil, de contact-drawer en de cursor werken.
+**Stand (2026-10-25):** live op https://jessekamps.vercel.app. Alle tickets zijn gemerged behalve #15 (pagina "Over", wacht op ontwerp). Elke merge naar `main` deployt automatisch naar productie.
 
-**Bezig:** #8 (Home-scrollgedrag), #10 (hoofdstuk-indicator), #11 (case-nav).
+**Gebouwd:** Home (snap, actieve case, paneelwissel, eindeloze lus op desktop), case-pagina's (`/werk/<slug>`), de morph Home → Case, de nav-pil, de contact-drawer, de hoofdstuk-indicator, de case-nav, de eigen cursor, SEO (sitemap, OG, favicon), de 404 en een axe-test (`pnpm a11y`). Lighthouse geeft 100/100/100/100 op Home; op de case-pagina is Accessibility 96, alleen door de bewuste `#949494`.
 
-**Daarna:** #13 (overgang Home → Case), dan #14 (eindeloze lus, eerst desktop), dan #16 (polish en livegang; de polish-lijst staat in het issue).
-
-**Open voor Jesse:**
-- De Pages CMS GitHub-app installeren op de repo (één klik in de browser), daarna testen we de media-upload.
-- Domein en DNS (bij #16).
+**Open:**
+- **Pages CMS:** de GitHub-app installeren op de repo (Jesse, één klik in de browser), daarna de media-upload en de preview testen.
+- **Echte content:** de cases, afbeeldingen en teksten zijn placeholders (Belsimpel, KC en de blokken). Het agency staat overal op "Build in Amsterdam". De mail en de LinkedIn-URL in `src/config.ts` zijn placeholders.
+- **Safari handmatig testen:** de eindeloze lus en scroll-snap. Playwright-WebKit start niet op deze macOS-versie.
+- **Eigen domein:** pas dan `site` in `astro.config.mjs` aan en zet de DNS bij de registrar.
+- **#15 "Over":** zodra er een ontwerp is. Dan linken de knop Expertise en het persoonsicoon in de pil daarheen.

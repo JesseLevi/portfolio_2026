@@ -22,7 +22,9 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 
 ## Afspraken in de code
 
+- Live: https://jessekamps.vercel.app (Vercel-project `portfolio-2026`). De automatisch gegenereerde `*.vercel.app`-URL's per deploy zitten achter Vercel-authenticatie.
 - Routes: Home `/`, case `/werk/<slug>`. Engels later onder `/en/...`.
+- Inter 4 staat op `font-optical-sizing: none`, anders is grote tekst smaller dan in Figma.
 - `BaseLayout` heeft de props `title`, `description` en `noindex`, plus een slot `head`. `NavPill` en `ContactDrawer` staan al in de layout; pagina's plaatsen ze niet zelf.
 - Elk element met het attribuut `data-open-contact` opent de contact-drawer.
 - Screenshots in parallelle worktrees: draai `scratchpad/shot.sh` van de orchestrator (een lock op poort 4329), niet `pnpm screenshot` direct.
