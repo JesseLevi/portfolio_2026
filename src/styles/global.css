@@ -40,6 +40,8 @@
     color: var(--color-ink);
     font-family: var(--font-sans);
     font-weight: 500;
+    /* Inter 4 heeft een opsz-as; zonder dit worden grote corpsen smaller dan in Figma (88px: 412 vs 443). */
+    font-optical-sizing: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
