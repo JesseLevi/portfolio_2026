@@ -1,13 +1,29 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Intro from '../components/Intro.astro';
+import CaseList from '../components/home/CaseList.astro';
+import CasePanel from '../components/home/CasePanel.astro';
+import { getCases } from '../lib/cases';
 import { getLocale, t } from '../i18n';
 
 const locale = getLocale(Astro.currentLocale);
+const cases = await getCases(locale);
 ---
 
-<BaseLayout title={t('site.name', locale)} description={t('site.role', locale)}>
-  <!-- Placeholder: de echte Home komt in een later ticket. Bouwstenen: /styleguide. -->
-  <main class="p-4">
-    <h1 class="text-heading">{t('site.name', locale)}</h1>
+<BaseLayout
+  title={t('home.title', locale)}
+  description={t('home.description', locale)}
+>
+  <!--
+    Linkerkolom = gewone documentscroll, paneel = sticky (desktop) of vast
+    onderin (mobiel). #8 voegt snap en de wissel toe.
+  -->
+  <main class="grid [--panel-h:min(400px,46svh)] lg:grid-cols-2">
+    <h1 class="sr-only">{t('home.title', locale)}</h1>
+    <div class="px-6 pb-(--panel-h) lg:mx-auto lg:w-max lg:max-w-full lg:pb-0">
+      <Intro align="start" class="py-12 lg:h-100 lg:justify-center lg:py-0" />
+      <CaseList cases={cases} label={t('home.cases', locale)} />
+    </div>
+    <CasePanel cases={cases} />
   </main>
 </BaseLayout>

@@ -1,0 +1,38 @@
+---
+import type { CaseEntry } from '../../lib/cases';
+
+interface Props {
+  cases: CaseEntry[];
+  /** Toegankelijke naam van de lijst. */
+  label: string;
+}
+
+const { cases, label } = Astro.props;
+---
+
+<!--
+  Titellijst van Home. Elk item: data-case (slug), data-index, data-color
+  (hero.color) en data-active op het actieve item. #8 wisselt data-active.
+-->
+<ol
+  aria-label={label}
+  class="text-title-lg lg:text-title-xl flex flex-col gap-2 lg:gap-8"
+  data-case-list
+>
+  {cases.map((c, i) => (
+    <li
+      class="text-muted data-active:text-ink transition-colors"
+      data-case={c.data.slug}
+      data-index={i}
+      data-color={c.data.hero.color}
+      data-active={i === 0 ? '' : undefined}
+    >
+      <a
+        href={`/werk/${c.data.slug}`}
+        class="focus-visible:outline-ink block w-fit focus-visible:outline-2 focus-visible:outline-offset-4"
+      >
+        {c.data.title}
+      </a>
+    </li>
+  ))}
+</ol>
