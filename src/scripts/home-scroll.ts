@@ -5,11 +5,23 @@
 //
 // Haakpunten voor #13 en #14: getItems(), getActiveIndex(), setActive(i),
 // scrollToItem(i) en het document-event `home-active` (detail: { index, slug }).
+//
+// Eindeloze lus (#14, alleen pointer: fine en geen reduced motion): achter de
+// lijst staat een kopie van intro + lijst (aria-hidden, inert). Staat de kopie
+// na het scrollen exact op de plek van de beginstaat, dan springen we direct
+// terug naar het origineel; het beeld is identiek, dus de sprong is onzichtbaar.
+// getItems() bevat alleen de echte items; de kopieën tellen alleen mee voor
+// het bepalen van het actieve item (ze dragen dezelfde data-index).
 
 import { consumeReturnSlug } from './view-transition.ts';
 
 const SNAP_ATTR = 'data-home-snap';
 const REDUCED = '(prefers-reduced-motion: reduce)';
+const LOOP_ATTR = 'data-home-loop';
+const LOOP_QUERY =
+  '(pointer: fine) and (prefers-reduced-motion: no-preference)';
+/** Terugval voor browsers zonder `scrollend`. */
+const SCROLL_IDLE_MS = 150;
 
 export interface HomeItem {
   index: number;
@@ -30,6 +42,8 @@ let activeIndex = -1;
 let pending: number | null = null;
 let pendingTimer: number | undefined;
 let cleanup: (() => void) | null = null;
+/** <li>'s van de kopie-lijst (leeg als de lus uit staat). */
+let cloneTitles: HTMLElement[] = [];
 
 /** Alle cases, gesorteerd op index. */
 export function getItems(): HomeItem[] {
@@ -82,6 +96,13 @@ function onLeave(e: Event) {
   void document.body.offsetWidth; // reflow: de stijlwissel gebeurt zonder fade
 }
 
+/** Zet data-active op de kopie-titels die bij het actieve item horen. */
+function syncCloneActive(): void {
+  for (const li of cloneTitles) {
+    li.toggleAttribute('data-active', Number(li.dataset.index) === activeIndex);
+  }
+}
+
 /** Hoogte van de intro = y van de snaplijn (viewportcoördinaat). */
 function snapLine(): number {
   return introEl?.getBoundingClientRect().height ?? 0;
@@ -107,6 +128,7 @@ export function setActive(index: number): void {
       else item.panel.setAttribute('aria-hidden', 'true');
     }
   }
+  syncCloneActive();
   if (next.color) panelRoot?.style.setProperty('--panel-color', next.color);
   document.dispatchEvent(
     new CustomEvent('home-active', { detail: { index, slug: next.slug } }),
@@ -131,14 +153,106 @@ function closestIndex(): number {
   const line = snapLine();
   let best = 0;
   let bestDist = Infinity;
-  for (const item of getItems()) {
-    const d = Math.abs(item.title.getBoundingClientRect().top - line);
+  const titles = [...getItems().map((i) => i.title), ...cloneTitles];
+  for (const li of titles) {
+    const d = Math.abs(li.getBoundingClientRect().top - line);
     if (d < bestDist) {
       bestDist = d;
-      best = item.index;
+      best = Number(li.dataset.index);
     }
   }
   return best;
+}
+
+/**
+ * Eindeloze lus: plaatst een kopie van intro + lijst achter de lijst en springt
+ * na het scrollen terug als de kopie de plek van het origineel heeft bereikt.
+ * Geeft de opruimfunctie terug (`restore`: eerst naar het origineel springen).
+ */
+function enableLoop(): (restore: boolean) => void {
+  if (!list || !introEl || !list.parentElement) return () => {};
+  const column = list.parentElement;
+  const root = document.documentElement;
+
+  const clone = document.createElement('div');
+  clone.setAttribute('data-home-loop-clone', '');
+  clone.setAttribute('aria-hidden', 'true');
+  clone.inert = true;
+  // Minstens een viewport hoog, zodat de kopie-intro exact op 0 kan komen.
+  clone.style.minHeight = '100svh';
+
+  const introCopy = introEl.cloneNode(true) as HTMLElement;
+  introCopy.removeAttribute('data-home-intro');
+  const listCopy = list.cloneNode(true) as HTMLElement;
+  listCopy.removeAttribute('data-case-list');
+  for (const a of listCopy.querySelectorAll('a')) {
+    a.setAttribute('tabindex', '-1');
+  }
+  clone.append(introCopy, listCopy);
+  for (const el of clone.querySelectorAll('[data-open-contact]')) {
+    el.removeAttribute('data-open-contact');
+  }
+  column.append(clone);
+  cloneTitles = [
+    ...listCopy.querySelectorAll<HTMLElement>(':scope > li[data-index]'),
+  ];
+  root.setAttribute(LOOP_ATTR, '');
+  syncCloneActive();
+
+  /** Spring terug zodra de kopie op de plek van het origineel staat. */
+  const wrap = () => {
+    const start = clone.getBoundingClientRect().top + window.scrollY;
+    const y = window.scrollY;
+    if (y < start - 2) return;
+    window.scrollTo({ top: Math.max(0, y - start), behavior: 'instant' });
+  };
+  // Van de laatste titel naar de kopie-intro is één scherm (intro + titel). Eén
+  // wieltik haalt de halve afstand niet, en dan snapt de browser terug. Zodra
+  // een tik omlaag voorbij de laatste titel komt, scrollen we zelf door naar de
+  // kopie. (Bij het event staat scrollY al na de tik; vandaar >= i.p.v. ===.)
+  let bridging = false;
+  const onWheel = (e: WheelEvent) => {
+    if (bridging || e.deltaY <= 0 || e.ctrlKey) return;
+    const lastTitle = getItems().at(-1)?.title;
+    if (!lastTitle) return;
+    const lastSnap =
+      lastTitle.getBoundingClientRect().top + window.scrollY - snapLine();
+    const start = clone.getBoundingClientRect().top + window.scrollY;
+    const y = window.scrollY;
+    if (y < lastSnap - 2 || y >= start - 2) return;
+    bridging = true;
+    window.scrollTo({ top: start, behavior: 'smooth' });
+  };
+  const endBridge = () => {
+    bridging = false;
+  };
+  window.addEventListener('scrollend', endBridge);
+  window.addEventListener('wheel', onWheel, { passive: true });
+
+  let idle: number | undefined;
+  const onScrollIdle = () => {
+    window.clearTimeout(idle);
+    idle = window.setTimeout(() => {
+      bridging = false;
+      wrap();
+    }, SCROLL_IDLE_MS);
+  };
+  const hasScrollEnd = 'onscrollend' in window;
+  if (hasScrollEnd) window.addEventListener('scrollend', wrap);
+  else window.addEventListener('scroll', onScrollIdle, { passive: true });
+
+  return (restore) => {
+    window.removeEventListener('wheel', onWheel);
+    window.removeEventListener('scrollend', endBridge);
+    window.removeEventListener('scrollend', wrap);
+    window.removeEventListener('scroll', onScrollIdle);
+    window.clearTimeout(idle);
+    // Sta je op de kopie (zelfde beeld), ga dan eerst naar het origineel.
+    if (restore) wrap();
+    clone.remove();
+    cloneTitles = [];
+    root.removeAttribute(LOOP_ATTR);
+  };
 }
 
 function setup(): () => void {
@@ -158,6 +272,19 @@ function setup(): () => void {
   if (introEl) ro.observe(introEl);
   if (last) ro.observe(last);
   root.setAttribute(SNAP_ATTR, '');
+
+  // Lus aan/uit volgens de media query (ook bij wijzigingen tijdens het gebruik).
+  const loopMq = window.matchMedia(LOOP_QUERY);
+  let disableLoop: ((restore: boolean) => void) | null = null;
+  const syncLoop = () => {
+    if (loopMq.matches && !disableLoop) disableLoop = enableLoop();
+    else if (!loopMq.matches && disableLoop) {
+      disableLoop(true);
+      disableLoop = null;
+    }
+  };
+  syncLoop();
+  loopMq.addEventListener('change', syncLoop);
 
   const update = () => {
     if (pending === null) setActive(closestIndex());
@@ -219,6 +346,9 @@ function setup(): () => void {
     window.removeEventListener('resize', onScroll);
     currentList?.removeEventListener('focusin', onFocusIn);
     document.removeEventListener('home-leave', onLeave);
+    loopMq.removeEventListener('change', syncLoop);
+    disableLoop?.(false);
+    disableLoop = null;
     ro.disconnect();
     cancelAnimationFrame(raf);
     window.clearTimeout(pendingTimer);
