@@ -9,7 +9,7 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<!-- 62px. Ring (inside), witte achtergrond en inner shadows uit Figma 6164:23211. -->
+<!-- PNG i.p.v. webp: lossy webp maakt het wit #fefefe, waardoor de afbeelding als blok zichtbaar wordt. 62px. Ring (inside), witte achtergrond en inner shadows uit Figma 6164:23211. -->
 <div
   class:list={[
     'bg-paper relative size-[62px] shrink-0 overflow-hidden rounded-full shadow-[inset_0_2px_10px_-4px_rgb(0_0_0/.25),inset_0_3px_4px_-5px_rgb(0_0_0/.25)]',
@@ -22,6 +22,7 @@ const { class: className } = Astro.props;
     width={48}
     height={48}
     densities={[2, 4]}
+    format="png"
     class="absolute top-[7px] left-[7px] size-12"
   />
   <span class="bg-ink absolute top-[55px] left-[17px] h-2.5 w-[33px]"></span>
