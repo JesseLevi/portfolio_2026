@@ -214,6 +214,17 @@ html:has([data-case-panel]) [data-nav-pill] {
   overflow: hidden;
 }
 
+/*
+ * Geen tegenhanger op de nieuwe pagina (bv. via de Home-link terwijl Home bij
+ * een andere case begint): verberg de oude hero meteen. Anders hangt hij een
+ * halve seconde boven de nieuwe pagina terwijl hij uitfadet.
+ */
+::view-transition-old(case-block):only-child,
+::view-transition-old(case-shot):only-child {
+  animation: none;
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   /* Rustige fade van de rest (o.a. de linkerkolom van Home): 400ms, ease-out. */
   ::view-transition-old(root),

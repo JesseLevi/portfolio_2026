@@ -13,7 +13,7 @@
 // getItems() bevat alleen de echte items; de kopieën tellen alleen mee voor
 // het bepalen van het actieve item (ze dragen dezelfde data-index).
 
-import { consumeReturnSlug } from './view-transition.ts';
+import { afterTransition, consumeReturnSlug } from './view-transition.ts';
 
 const SNAP_ATTR = 'data-home-snap';
 const REDUCED = '(prefers-reduced-motion: reduce)';
@@ -389,6 +389,13 @@ function setup(): () => void {
         setTransitionNames(item.panel, false);
       }
     }
+    // Na de overgang horen de namen weer op het actieve item (volgende klik).
+    const currentPanel = panelRoot;
+    afterTransition(() => {
+      if (panelRoot !== currentPanel) return;
+      const active = getItems().find((i) => i.index === activeIndex);
+      if (active?.panel) setTransitionNames(active.panel, true);
+    });
   }
 
   const currentList = list;
@@ -419,6 +426,8 @@ function teardown() {
 }
 
 function init() {
+  // Al opgezet bij astro:after-swap voor deze pagina: niet nog eens.
+  if (cleanup && list?.isConnected) return;
   teardown();
   list = document.querySelector<HTMLElement>('[data-case-list]');
   panelRoot = document.querySelector<HTMLElement>('[data-case-panel]');
@@ -428,5 +437,10 @@ function init() {
 }
 
 // Eén keer registreren (een module-script draait één keer, ook met <ClientRouter />).
+// Bij navigatie al op astro:after-swap: dat valt nog binnen de update van de
+// View Transition, dus de namen van het paneel staan vóór de nieuwe snapshot.
+// astro:page-load komt pas daarna (eerste laadbeurt, of als dit script nog niet
+// geladen was).
+document.addEventListener('astro:after-swap', init);
 document.addEventListener('astro:page-load', init);
 document.addEventListener('astro:before-swap', teardown);
