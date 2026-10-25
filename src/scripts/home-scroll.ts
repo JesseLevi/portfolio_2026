@@ -6,7 +6,7 @@
 // Haakpunten voor #13 en #14: getItems(), getActiveIndex(), setActive(i),
 // scrollToItem(i) en het document-event `home-active` (detail: { index, slug }).
 //
-// Eindeloze lus (#14, alleen pointer: fine en geen reduced motion): achter de
+// Eindeloze lus (#14, desktop en touch, niet bij reduced motion): achter de
 // lijst staat een kopie van intro + lijst (aria-hidden, inert). Staat de kopie
 // na het scrollen exact op de plek van de beginstaat, dan springen we direct
 // terug naar het origineel; het beeld is identiek, dus de sprong is onzichtbaar.
@@ -18,8 +18,7 @@ import { consumeReturnSlug } from './view-transition.ts';
 const SNAP_ATTR = 'data-home-snap';
 const REDUCED = '(prefers-reduced-motion: reduce)';
 const LOOP_ATTR = 'data-home-loop';
-const LOOP_QUERY =
-  '(pointer: fine) and (prefers-reduced-motion: no-preference)';
+const LOOP_QUERY = '(prefers-reduced-motion: no-preference)';
 /** Terugval voor browsers zonder `scrollend`. */
 const SCROLL_IDLE_MS = 150;
 /** Wielafstand voorbij de laatste titel (deel van de viewporthoogte) voor de lus. */
@@ -182,8 +181,10 @@ function enableLoop(): (restore: boolean) => void {
   clone.setAttribute('data-home-loop-clone', '');
   clone.setAttribute('aria-hidden', 'true');
   clone.inert = true;
-  // Minstens een viewport hoog, zodat de kopie-intro exact op 0 kan komen.
-  clone.style.minHeight = '100svh';
+  // Minstens een viewport hoog, zodat de kopie-intro exact op 0 kan komen. lvh:
+  // op iOS is de viewport groter zodra de balken inklappen; met svh haalt de
+  // scroll dan de beginstaat van de kopie niet en springt de lus nooit terug.
+  clone.style.minHeight = '100lvh';
 
   const introCopy = introEl.cloneNode(true) as HTMLElement;
   introCopy.removeAttribute('data-home-intro');
