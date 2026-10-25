@@ -17,6 +17,8 @@ export const nl = {
   'case.agency': 'Agency:',
   'case.work': 'Werk:',
   'chapters.label': 'Hoofdstukken',
+  // nav
+  'nav.label': 'Hoofdnavigatie',
 } as const;
 
 export type TranslationKey = keyof typeof nl;
