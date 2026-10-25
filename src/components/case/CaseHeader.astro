@@ -6,9 +6,11 @@ import type { CaseEntry } from '../../lib/cases';
 
 interface Props {
   entry: CaseEntry;
+  /** Ankers voor de hoofdstuk-indicator: het openingsbeeld en de opdracht (titel en meta). */
+  ids: { opening: string; brief: string };
 }
 
-const { entry } = Astro.props;
+const { entry, ids } = Astro.props;
 const { title, slug, agency, work, hero } = entry.data;
 const locale = getLocale(Astro.currentLocale);
 ---
@@ -21,6 +23,7 @@ const locale = getLocale(Astro.currentLocale);
 <header class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
   <!-- Hook voor #11 (overgang vanaf Home) en #13. -->
   <div
+    id={ids.opening}
     data-case-hero
     data-case={slug}
     class="col-span-full mt-[68px] aspect-[5/3] overflow-hidden rounded-lg md:mt-[72px] md:rounded-2xl"
@@ -36,18 +39,21 @@ const locale = getLocale(Astro.currentLocale);
     />
   </div>
 
-  <h1 class="text-title-md md:text-title-lg col-start-2 mt-[21px] text-center md:mt-12">
-    {title}
-  </h1>
+  <!-- Subgrid: titel en meta houden de kolommen van de header. -->
+  <div id={ids.brief} class="col-span-full grid grid-cols-subgrid">
+    <h1 class="text-title-md md:text-title-lg col-start-2 mt-[21px] text-center md:mt-12">
+      {title}
+    </h1>
 
-  <dl class="text-body text-muted col-span-full mt-10 md:col-start-2 md:-col-end-1 grid grid-cols-[auto_1fr] gap-x-4 gap-y-[30px] md:mt-12 md:grid-cols-[167px_1fr]">
-    <dt>{t('case.agency', locale)}</dt>
-    <dd>{agency}</dd>
-    <dt>{t('case.work', locale)}</dt>
-    <dd>
-      {paragraphs(work).map((p) => (
-        <p class="[&:not(:first-child)]:mt-[1lh]">{p}</p>
-      ))}
-    </dd>
-  </dl>
+    <dl class="text-body text-muted col-span-full mt-10 md:col-start-2 md:-col-end-1 grid grid-cols-[auto_1fr] gap-x-4 gap-y-[30px] md:mt-12 md:grid-cols-[167px_1fr]">
+      <dt>{t('case.agency', locale)}</dt>
+      <dd>{agency}</dd>
+      <dt>{t('case.work', locale)}</dt>
+      <dd>
+        {paragraphs(work).map((p) => (
+          <p class="[&:not(:first-child)]:mt-[1lh]">{p}</p>
+        ))}
+      </dd>
+    </dl>
+  </div>
 </header>

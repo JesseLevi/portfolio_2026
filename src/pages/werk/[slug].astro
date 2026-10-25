@@ -25,8 +25,15 @@ const { title, work, blocks, hero } = entry.data;
 // De hero is een png met schaduw (alpha): jpg zou zwart worden, dus png.
 const og = await getImage({ src: hero.image, width: 1200, format: 'png' });
 
+// De header telt mee als de eerste twee hoofdstukken: het openingsbeeld en de opdracht.
+const header = { opening: 'opening', brief: 'opdracht' };
+const headerChapters = [
+  { id: header.opening, name: t('chapters.opening', locale) },
+  { id: header.brief, name: t('chapters.brief', locale) },
+];
+
 // Anker per blok: slug van de hoofdstuknaam, uniek gemaakt met een teller.
-const used = new Set<string>();
+const used = new Set<string>(Object.values(header));
 const ids = blocks.map((block) => {
   const base =
     block.chapter
@@ -52,7 +59,7 @@ const ids = blocks.map((block) => {
   <main>
     <BackButton />
     <article class="mx-auto max-w-[calc(1026px+2rem)] px-4">
-      <CaseHeader entry={entry} />
+      <CaseHeader entry={entry} ids={header} />
       <div class="mt-[72px] flex flex-col gap-[72px] md:mt-[104px] md:gap-[104px]">
         {blocks.map((block, i) => (
           <CaseBlock block={block} id={ids[i]!} />
@@ -61,7 +68,10 @@ const ids = blocks.map((block) => {
     </article>
   </main>
   <ChapterNav
-    chapters={blocks.map((block, i) => ({ id: ids[i]!, name: block.chapter }))}
+    chapters={[
+      ...headerChapters,
+      ...blocks.map((block, i) => ({ id: ids[i]!, name: block.chapter })),
+    ]}
   />
   <CaseFooter />
 </BaseLayout>

@@ -23,6 +23,8 @@ export const nl = {
   'case.work': 'Werk:',
   'case.back': 'Terug naar Home',
   'chapters.label': 'Hoofdstukken',
+  'chapters.opening': 'Opening',
+  'chapters.brief': 'Opdracht',
   // 404
   'notFound.title': 'Pagina niet gevonden',
   'notFound.description': 'Deze pagina bestaat niet (meer).',
