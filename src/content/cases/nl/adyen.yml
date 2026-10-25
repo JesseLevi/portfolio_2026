@@ -1,0 +1,36 @@
+title: Adyen
+slug: adyen
+order: 4
+agency: Build in Amsterdam
+work: |-
+  Placeholdertekst over het werk voor Adyen. Hier komt een korte beschrijving van de opdracht en mijn rol.
+
+  Een tweede alinea, gescheiden door een lege regel, met meer context over het project.
+hero:
+  image: ../../../assets/cases/adyen-hero.png
+  alt: Placeholder-beschrijving van de hero van Adyen
+  color: '#cfe8da'
+blocks:
+  - type: image
+    chapter: Iconen
+    image: ../../../assets/cases/adyen-image.png
+    alt: Placeholder-beschrijving van het beeld voor Adyen
+    fit: contained
+    color: '#efefef'
+    caption: Bijschrift bij het beeld
+  - type: double
+    chapter: Product
+    left:
+      image: ../../../assets/cases/adyen-left.png
+      alt: Placeholder-beschrijving van de linkerafbeelding
+    right:
+      image: ../../../assets/cases/adyen-right.png
+      alt: Placeholder-beschrijving van de rechterafbeelding
+    fit: full-bleed
+    color: '#cfe8da'
+  - type: text
+    chapter: Aanpak
+    body: |-
+      Placeholdertekst over de aanpak van Adyen.
+
+      Een tweede alinea over de keuzes en het resultaat.

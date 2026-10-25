@@ -1,0 +1,175 @@
+# Pages CMS-configuratie. Loopt 1-op-1 gelijk met het zod-schema in src/content.config.ts.
+#
+# Media: uploads komen in src/assets/cases/. Het pad dat in de YAML wordt geschreven
+# is relatief aan de contentbestanden (src/content/cases/<taal>/<slug>.yml), zodat
+# Astro's image()-helper het oplost: ../../../assets/cases/<bestand>.
+media:
+  - name: images
+    label: Case-afbeeldingen
+    input: src/assets/cases
+    output: ../../../assets/cases
+    categories: [image]
+
+content:
+  - name: cases-nl
+    label: Cases (NL)
+    type: collection
+    path: src/content/cases/nl
+    format: yaml
+    filename:
+      template: '{fields.slug}.yml'
+      field: false
+    view:
+      primary: title
+      fields: [title, agency, order]
+      sort: order
+      order: asc
+    fields:
+      - name: title
+        label: Titel
+        type: string
+        required: true
+      - name: slug
+        label: Slug (= bestandsnaam)
+        type: string
+        required: true
+        pattern:
+          regex: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          message: Kleine letters, cijfers en streepjes
+      - name: order
+        label: Volgorde
+        type: number
+        required: true
+      - name: agency
+        label: Bureau
+        type: string
+        required: true
+      - name: work
+        label: Werk (alinea's gescheiden door een lege regel)
+        type: text
+        required: true
+      - name: hero
+        label: Hero
+        type: object
+        required: true
+        fields:
+          - name: image
+            label: Afbeelding
+            type: image
+            media: images
+            required: true
+          - name: alt
+            label: Alt-tekst
+            type: string
+            required: true
+          - name: color
+            label: Kleur (ook het paneel op Home)
+            type: string
+            default: '#efefef'
+            pattern:
+              regex: '^#[0-9a-fA-F]{6}$'
+              message: Hexkleur, bijvoorbeeld #efefef
+      - name: blocks
+        label: Blokken
+        type: block
+        list: true
+        blockKey: type
+        blocks:
+          - name: image
+            label: Afbeelding
+            fields:
+              - name: chapter
+                label: Hoofdstuk
+                type: string
+                required: true
+              - name: image
+                label: Afbeelding
+                type: image
+                media: images
+                required: true
+              - name: alt
+                label: Alt-tekst
+                type: string
+                required: true
+              - name: fit
+                label: Weergave
+                type: select
+                default: contained
+                options:
+                  values:
+                    - { name: contained, label: Contained }
+                    - { name: full-bleed, label: Full-bleed }
+              - name: color
+                label: Kleur
+                type: string
+                default: '#efefef'
+                pattern:
+                  regex: '^#[0-9a-fA-F]{6}$'
+                  message: Hexkleur, bijvoorbeeld #efefef
+              - name: caption
+                label: Bijschrift
+                type: string
+          - name: double
+            label: Dubbel
+            fields:
+              - name: chapter
+                label: Hoofdstuk
+                type: string
+                required: true
+              - name: left
+                label: Links
+                type: object
+                required: true
+                fields:
+                  - name: image
+                    label: Afbeelding
+                    type: image
+                    media: images
+                    required: true
+                  - name: alt
+                    label: Alt-tekst
+                    type: string
+                    required: true
+              - name: right
+                label: Rechts
+                type: object
+                required: true
+                fields:
+                  - name: image
+                    label: Afbeelding
+                    type: image
+                    media: images
+                    required: true
+                  - name: alt
+                    label: Alt-tekst
+                    type: string
+                    required: true
+              - name: fit
+                label: Weergave
+                type: select
+                default: contained
+                options:
+                  values:
+                    - { name: contained, label: Contained }
+                    - { name: full-bleed, label: Full-bleed }
+              - name: color
+                label: Kleur
+                type: string
+                default: '#efefef'
+                pattern:
+                  regex: '^#[0-9a-fA-F]{6}$'
+                  message: Hexkleur, bijvoorbeeld #efefef
+              - name: caption
+                label: Bijschrift
+                type: string
+          - name: text
+            label: Tekst
+            fields:
+              - name: chapter
+                label: Hoofdstuk
+                type: string
+                required: true
+              - name: body
+                label: Tekst (alinea's gescheiden door een lege regel)
+                type: text
+                required: true
