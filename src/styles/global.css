@@ -21,7 +21,8 @@
   --text-title-lg--line-height: normal;
   --text-title-md: 48px;
   --text-title-md--line-height: normal;
-  --text-heading: 24px;
+  /* 22px in de mobiele layout, 24px vanaf `lg` (zie :root hieronder). */
+  --text-heading: 22px;
   --text-heading--line-height: normal;
   --text-body: 16px;
   --text-body--line-height: normal;
@@ -160,6 +161,11 @@
 @media (min-width: 768px) {
   :root {
     --vt-radius: 16px;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --text-heading: 24px;
   }
 }
 
