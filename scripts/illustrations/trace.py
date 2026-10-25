@@ -3,8 +3,9 @@
     python3 scripts/illustrations/trace.py scripts/illustrations/avatar.json [overlay.png]
 
 Vereist: potrace (brew install potrace) en Python met numpy, scipy en pillow.
-De spec (JSON) noemt de bron-PNG, de uitvoer (plus een stilstaande `-static.svg`), de
-animatie-CSS en de lagen. Coördinaten
+De spec (JSON) noemt de bron-PNG, de uitvoer, de animatie-CSS en de lagen. Met `static`
+komt er een stilstaande `-static.svg` bij; `class` zet een klasse op de <svg> en dient als
+prefix voor id's (nodig als de SVG inline in de pagina staat). Coördinaten
 zijn pixels in de bron-PNG. Met een tweede argument schrijft het script een overlay waarin
 elke laag een eigen kleur heeft: zo controleer je waar de sneden lopen.
 
@@ -170,19 +171,24 @@ def main():
         g = f'<g class="{n}">{paths(n)}{"".join(group(m) for m in parent if parent[m] == n)}</g>'
         if out[n].get('clip'):
             # De clip op een stilstaande wrapper, zodat hij niet meebeweegt met de laag.
+            cid = f'{spec.get("class", "svg")}-{n}-clip'
             g = (
-                f'<clipPath id="{n}-clip"><path transform="{tf}" d="{out[n]["clip"]}"/></clipPath>'
-                f'<g clip-path="url(#{n}-clip)">{g}</g>'
+                f'<clipPath id="{cid}"><path transform="{tf}" d="{out[n]["clip"]}"/></clipPath>'
+                f'<g clip-path="url(#{cid})">{g}</g>'
             )
         return g
 
     css = minify_css(open(os.path.join(here, spec['css'])).read())
     extras = open(os.path.join(here, spec['extras'])).read().strip() if 'extras' in spec else ''
     body = paths('body') + extras + ''.join(group(m) for m in parent if parent[m] is None)
-    head = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}">'
-    # Ook een stilstaande variant: de pagina kiest die bij reduced motion via <picture>, want
-    # niet elke browser geeft die voorkeur door aan een SVG in een <img>.
-    for path, style in [(spec['out'], f'<style>{css}</style>'), (spec['out'].replace('.svg', '-static.svg'), '')]:
+    cls = f' class="{spec["class"]}"' if 'class' in spec else ''
+    head = f'<svg xmlns="http://www.w3.org/2000/svg"{cls} width="{W}" height="{H}" viewBox="0 0 {W} {H}">'
+    files = [(spec['out'], f'<style>{css}</style>')]
+    if spec.get('static'):
+        # Een stilstaande variant voor een SVG in een <img>: de pagina kiest die bij reduced
+        # motion via <picture>, want niet elke browser geeft die voorkeur door aan het beeld.
+        files.append((spec['out'].replace('.svg', '-static.svg'), ''))
+    for path, style in files:
         svg = f'{head}{style}{body}</svg>\n'
         open(path, 'w').write(svg)
         print(f'{path}: {len(svg)} bytes')

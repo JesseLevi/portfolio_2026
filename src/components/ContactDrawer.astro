@@ -3,10 +3,10 @@
 // `data-open-contact` opent hem (gedrag in src/scripts/contact-drawer.ts).
 import Button from './Button.astro';
 import Icon from './Icon.astro';
-// Getraceerd uit illustration.png met scripts/illustrations. Hoofd, koffiedamp en been
-// bewegen in de SVG zelf; bij reduced motion de stilstaande variant.
-import illustration from '../assets/contact/illustration.svg';
-import illustrationStatic from '../assets/contact/illustration-static.svg';
+// Getraceerd uit illustration.png met scripts/illustrations. Inline i.p.v. <img>: een gesloten
+// <dialog> is display: none, dus de animatie (hoofd, koffiedamp, been) begint bij elke keer
+// openen opnieuw, met de blik naar de bezoeker. Reduced motion zit in de CSS van de SVG.
+import illustration from '../assets/contact/illustration.svg?raw';
 import { siteConfig } from '../config';
 import { getLocale, t } from '../i18n';
 
@@ -66,19 +66,7 @@ const locale = getLocale(Astro.currentLocale);
       </section>
     </div>
 
-    <picture class="contents">
-      <source
-        media="(prefers-reduced-motion: reduce)"
-        srcset={illustrationStatic.src}
-      />
-      <img
-        src={illustration.src}
-        alt=""
-        width="290"
-        height="232"
-        class="illustration"
-      />
-    </picture>
+    <div class="illustration" aria-hidden="true" set:html={illustration} />
   </div>
 </dialog>
 
@@ -204,6 +192,11 @@ const locale = getLocale(Astro.currentLocale);
     height: auto;
     margin-top: auto;
     margin-bottom: 45px;
+  }
+
+  .illustration :global(svg) {
+    width: 100%;
+    height: auto;
   }
 
   .handle {
