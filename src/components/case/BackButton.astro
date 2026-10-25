@@ -1,0 +1,16 @@
+---
+// Terugknop op de case-pagina (Figma 6183:28575, mobiel 6183:28652): altijd fixed,
+// 32px van de hoek op desktop, 16px op mobiel.
+import Icon from '../Icon.astro';
+import { getLocale, t } from '../../i18n';
+
+const locale = getLocale(Astro.currentLocale);
+---
+
+<a
+  href="/"
+  aria-label={t('case.back', locale)}
+  class="bg-pill text-muted hover:text-ink focus-visible:outline-ink fixed top-4 left-4 z-40 flex size-9 items-center justify-center rounded-full transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 md:top-8 md:left-8"
+>
+  <Icon name="arrow-left" size={20} />
+</a>

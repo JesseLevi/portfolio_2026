@@ -1,6 +1,7 @@
 ---
-// Stroke-iconen uit Figma (viewBox 16, sluiten 20). Kleur via `currentColor`.
-export type IconName = 'home' | 'person' | 'send' | 'mail' | 'close';
+// Stroke-iconen uit Figma (viewBox 16, sluiten en pijl 20). Kleur via `currentColor`.
+export type IconName =
+  'home' | 'person' | 'send' | 'mail' | 'close' | 'arrow-left';
 
 interface Props {
   name: IconName;
@@ -9,8 +10,9 @@ interface Props {
 }
 
 const { name, size = 16, class: className } = Astro.props;
-const viewBox = name === 'close' ? 20 : 16;
-const strokeWidth = name === 'close' ? 1.66667 : 1.33333;
+const large = name === 'close' || name === 'arrow-left';
+const viewBox = large ? 20 : 16;
+const strokeWidth = large ? 1.66667 : 1.33333;
 ---
 
 <svg
@@ -47,6 +49,12 @@ const strokeWidth = name === 'close' ? 1.66667 : 1.33333;
     <>
       <path d="M14.6666 4.66669L8.67258 8.48469C8.46918 8.60283 8.23814 8.66506 8.00292 8.66506C7.76769 8.66506 7.53666 8.60283 7.33325 8.48469L1.33325 4.66669" />
       <path d="M2.66659 2.66669H13.3333C14.0696 2.66669 14.6666 3.26364 14.6666 4.00002V12C14.6666 12.7364 14.0696 13.3334 13.3333 13.3334H2.66659C1.93021 13.3334 1.33325 12.7364 1.33325 12V4.00002C1.33325 3.26364 1.93021 2.66669 2.66659 2.66669Z" />
+    </>
+  )}
+  {name === 'arrow-left' && (
+    <>
+      <path d="M10 15.8333L4.16667 10L10 4.16667" />
+      <path d="M15.8333 10H4.16667" />
     </>
   )}
   {name === 'close' && (
