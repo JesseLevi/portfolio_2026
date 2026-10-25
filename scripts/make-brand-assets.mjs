@@ -1,11 +1,12 @@
 // Eenmalig script: genereert public/og.png, favicon.svg, favicon-32.png en apple-touch-icon.png
 // uit src/assets/avatar.png. De uitvoer staat in de repo; draai dit alleen als de avatar of de tekst wijzigt.
-//   INTER_SEMIBOLD=/pad/naar/Inter-SemiBold.ttf INTER_MEDIUM=/pad/naar/Inter-Medium.ttf node scripts/make-brand-assets.mjs
-// De naam staat in SemiBold, de ondertitel in Medium. Zonder fonts valt de tekst terug op een systeemfont (sans-serif).
+//   INTER_MEDIUM=/pad/naar/Inter-Medium.ttf node scripts/make-brand-assets.mjs
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
-const { INTER_SEMIBOLD, INTER_MEDIUM } = process.env;
+const { INTER_MEDIUM } = process.env;
+if (!INTER_MEDIUM)
+  throw new Error('Zet INTER_MEDIUM op het pad naar Inter-Medium.ttf');
 // sharp is een dependency van Astro en niet direct van dit project: laad hem via Astro.
 const fromAstro = createRequire(
   createRequire(import.meta.url).resolve('astro/package.json'),
@@ -16,75 +17,77 @@ const avatarPath = 'src/assets/avatar.png';
 mkdirSync('public', { recursive: true });
 
 // --- OG-afbeelding 1200x630 ---
-const AV = 280;
-const circle = (size, extra = '') =>
-  Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><circle cx="${size / 2}" cy="${size / 2}" r="${size / 2 - 1}" ${extra}/></svg>`,
-  );
-// Avatar op een witte schijf, bijgesneden tot een cirkel, met de ring van de site (#f2f2f2).
-const avatar = await sharp(avatarPath)
-  .resize(AV, AV)
-  .flatten({ background: '#ffffff' })
-  .composite([{ input: circle(AV), blend: 'dest-in' }])
-  .png()
-  .toBuffer();
-const ring = circle(AV, 'fill="none" stroke="#f2f2f2" stroke-width="2"');
-// Tekst: met een fontbestand worden de glyphs als paden getekend (opentype.js, geen systeemfont nodig);
-// zonder valt hij terug op een SVG-<text> in een systeemfont.
+// De intro van Home (Intro.astro + Avatar.astro), S keer zo groot en gecentreerd:
+// avatar 62 met ring en inner shadows, 16 gap, naam en rol allebei 22px Medium, 6 gap ertussen.
+const W = 1200;
+const H = 630;
+const S = 2.6;
+const AV = 62 * S;
+const TEXT = 22 * S;
 const { default: opentype } = await import('opentype.js');
 // opentype.loadSync geeft in v2 niets terug: parse de buffer zelf.
-const load = (path) =>
-  path ? opentype.parse(new Uint8Array(readFileSync(path)).buffer) : null;
-const semibold = load(INTER_SEMIBOLD);
-const medium = load(INTER_MEDIUM);
+const font = opentype.parse(new Uint8Array(readFileSync(INTER_MEDIUM)).buffer);
+const em = TEXT / font.unitsPerEm;
+// line-height: normal = ascender + descender uit hhea.
+const lineH = (font.ascender - font.descender) * em;
 // Glyph voor glyph met kerning: de shaping van opentype.js struikelt over de ccmp-lookups van Inter.
-const toPath = (font, content, size) => {
-  const scale = size / font.unitsPerEm;
+const layout = (content) => {
   let x = 0;
   let prev = null;
-  const parts = [];
+  const glyphs = [];
   for (const char of content) {
     const glyph = font.charToGlyph(char);
-    if (prev) x += font.getKerningValue(prev, glyph) * scale;
-    parts.push(glyph.getPath(x, size, size).toPathData(2));
-    x += glyph.advanceWidth * scale;
+    if (prev) x += font.getKerningValue(prev, glyph) * em;
+    glyphs.push([glyph, x]);
+    x += glyph.advanceWidth * em;
     prev = glyph;
   }
-  return parts.join('');
+  return { glyphs, width: x };
 };
-const line = (content, size, color, y, font, weight) => {
-  const body = font
-    ? `<path fill="${color}" d="${toPath(font, content, size)}"/>`
-    : `<text y="${size}" font-family="sans-serif" font-weight="${weight}" font-size="${size}" fill="${color}">${content}</text>`;
-  return sharp(
-    Buffer.from(
-      `<svg xmlns="http://www.w3.org/2000/svg" width="700" height="${Math.ceil(size * 1.4)}">${body}</svg>`,
-    ),
-  )
+const name = layout('Jesse Kamps');
+const role = layout('Designer voor web en identiteit');
+const blockW = Math.max(AV, name.width, role.width);
+const blockH = AV + 16 * S + lineH + 6 * S + lineH;
+const left = (W - blockW) / 2;
+const top = (H - blockH) / 2;
+const textTop = top + AV + 16 * S;
+const text = (line, color, y) =>
+  `<path fill="${color}" d="${line.glyphs
+    .map(([glyph, x]) =>
+      glyph.getPath(left + x, y + font.ascender * em, TEXT).toPathData(2),
+    )
+    .join('')}"/>`;
+
+const r = AV / 2;
+const cx = left + r;
+const cy = top + r;
+// Inset box-shadow: een vlak met een cirkelgat (straal r - spread), verschoven en vervaagd, binnen de cirkel.
+const inset = (id, y, blur, spread) =>
+  `<filter id="${id}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${(blur * S) / 2}"/></filter>
+  <path filter="url(#${id})" clip-path="url(#av)" fill="rgb(0 0 0 / .25)" fill-rule="evenodd"
+    d="M${cx - 2 * r} ${cy - 2 * r}h${4 * r}v${4 * r}h${-4 * r}z M${cx} ${cy + y * S - (r - spread * S)}a${r - spread * S} ${r - spread * S} 0 1 0 0.01 0z"/>`;
+const avatar = (
+  await sharp(avatarPath)
+    .resize(Math.round(AV * 2))
     .png()
     .toBuffer()
-    .then((input) => ({ input, left: 470, top: y }));
-};
-const name = await line('Jesse Kamps', 84, '#000000', 228, semibold, 600);
-const role = await line(
-  'Designer voor web en identiteit',
-  42,
-  '#949494',
-  330,
-  medium,
-  500,
-);
-await sharp({
-  create: { width: 1200, height: 630, channels: 3, background: '#ffffff' },
-})
-  .composite([
-    { input: avatar, left: 120, top: 175 },
-    { input: ring, left: 120, top: 175 },
-    name,
-    role,
-  ])
+).toString('base64');
+
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
+  <rect width="${W}" height="${H}" fill="#ffffff"/>
+  <defs><clipPath id="av"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath></defs>
+  <image href="data:image/png;base64,${avatar}" x="${left}" y="${top}" width="${AV}" height="${AV}" clip-path="url(#av)"/>
+  ${inset('s1', 2, 10, -4)}
+  ${inset('s2', 3, 4, -5)}
+  <circle cx="${cx}" cy="${cy}" r="${r - S / 2}" fill="none" stroke="#f2f2f2" stroke-width="${S}"/>
+  ${text(name, '#000000', textTop)}
+  ${text(role, '#949494', textTop + lineH + 6 * S)}
+</svg>`;
+await sharp(Buffer.from(svg))
+  .flatten({ background: '#ffffff' })
   .png()
   .toFile('public/og.png');
+console.log(`OG: blok ${Math.round(blockW)}x${Math.round(blockH)}`);
 
 // --- Favicon ---
 const b64 = (await sharp(avatarPath).resize(96, 96).png().toBuffer()).toString(
