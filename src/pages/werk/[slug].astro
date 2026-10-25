@@ -68,6 +68,7 @@ const ids = blocks.map((block) => {
     </article>
   </main>
   <ChapterNav
+    visibleFrom={header.brief}
     chapters={[
       ...headerChapters,
       ...blocks.map((block, i) => ({ id: ids[i]!, name: block.chapter })),
