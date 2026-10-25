@@ -12,7 +12,7 @@ const { cases, label } = Astro.props;
 
 <!--
   Titellijst van Home. Elk item: data-case (slug), data-index, data-color
-  (hero.color) en data-active op het actieve item. #8 wisselt data-active.
+  (hero.color) en data-active op het actieve item (home-scroll.ts, #8). snap-start + scroll-mt (introhoogte) maken elke titel een snappunt.
 -->
 <ol
   aria-label={label}
@@ -21,7 +21,7 @@ const { cases, label } = Astro.props;
 >
   {cases.map((c, i) => (
     <li
-      class="text-muted data-active:text-ink transition-colors"
+      class="text-muted data-active:text-ink scroll-mt-(--intro-h,0px) snap-start transition-colors"
       data-case={c.data.slug}
       data-index={i}
       data-color={c.data.hero.color}

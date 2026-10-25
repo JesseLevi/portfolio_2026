@@ -27,7 +27,7 @@ const first = cases[0];
         href={`/werk/${c.data.slug}`}
         tabindex="-1"
         aria-hidden={i === 0 ? undefined : 'true'}
-        class="absolute inset-0 block opacity-0 transition-opacity duration-300 data-active:opacity-100"
+        class="absolute inset-0 block pointer-events-none opacity-0 transition-opacity duration-300 data-active:pointer-events-auto data-active:opacity-100"
         data-case={c.data.slug}
         data-index={i}
         data-color={c.data.hero.color}
