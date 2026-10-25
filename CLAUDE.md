@@ -27,6 +27,7 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 - Inter 4 staat op `font-optical-sizing: none`, anders is grote tekst smaller dan in Figma.
 - `BaseLayout` heeft de props `title`, `description` en `noindex`, plus een slot `head`. `NavPill` en `ContactDrawer` staan al in de layout; pagina's plaatsen ze niet zelf.
 - Elk element met het attribuut `data-open-contact` opent de contact-drawer.
+- Avatar en contactillustratie zijn SVG's die met `scripts/illustrations/trace.py` uit de PNG's getraceerd zijn, in lagen (hoofd, ogen, damp, been). De animatie-CSS zit in de SVG; de componenten tonen bij reduced motion via `<picture>` de `-static.svg`. Pas de animatie aan in `scripts/illustrations/*.css` en draai het script opnieuw; bewerk de SVG's niet met de hand. `avatar.png` blijft de bron, ook voor de OG-afbeelding.
 - Screenshots in parallelle worktrees: draai `scratchpad/shot.sh` van de orchestrator (een lock op poort 4329), niet `pnpm screenshot` direct.
 
 ## Ontwerpbeslissingen (Jesse, 2026-10-25)

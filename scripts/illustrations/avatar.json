@@ -1,0 +1,53 @@
+{
+  "src": "src/assets/avatar.png",
+  "out": "src/assets/avatar.svg",
+  "css": "avatar.css",
+  "layers": [
+    {
+      "name": "head",
+      "fill": true,
+      "poly": [
+        [20, 20],
+        [230, 20],
+        [230, 150],
+        [176, 150],
+        [166, 160],
+        [152, 167],
+        [138, 168],
+        [120, 162],
+        [104, 152],
+        [20, 152]
+      ],
+      "also_ink": [
+        [
+          [90, 152],
+          [108, 152],
+          [108, 159],
+          [90, 159]
+        ]
+      ]
+    },
+    {
+      "name": "face",
+      "within": "head",
+      "comps_in": [
+        [120, 90, 142, 104],
+        [148, 104, 166, 132],
+        [134, 134, 160, 144]
+      ],
+      "clip_seed": [125, 128]
+    },
+    {
+      "name": "eyeL",
+      "within": "head",
+      "comps_in": [[128, 104, 140, 120]],
+      "parent": "face"
+    },
+    {
+      "name": "eyeR",
+      "within": "head",
+      "comps_in": [[158, 100, 168, 115]],
+      "parent": "face"
+    }
+  ]
+}
