@@ -13,6 +13,7 @@ const locale = getLocale(Astro.currentLocale);
 
 <dialog id="contact-drawer" aria-labelledby="contact-drawer-title">
   <div class="panel">
+    <span class="handle" aria-hidden="true"></span>
     <button
       type="button"
       class="close"
@@ -190,8 +191,87 @@ const locale = getLocale(Astro.currentLocale);
     mix-blend-mode: multiply;
   }
 
-  @media (prefers-reduced-motion: reduce) {
+  .handle {
+    display: none;
+  }
+
+  /*
+   * Mobiel (Figma "Contact drawer / mobile"): een pull-up panel over de volle
+   * breedte, vast aan de onderkant, met een grijze waas over de pagina.
+   */
+  @media (max-width: 1023px) {
     dialog {
+      inset: auto 0 0 0;
+      width: 100%;
+      height: auto;
+      max-height: calc(100dvh - 32px);
+      border-radius: 32px 32px 0 0;
+      opacity: 1;
+      translate: 0 100%;
+      transition:
+        translate 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+        overlay 0.4s allow-discrete,
+        display 0.4s allow-discrete;
+    }
+
+    @starting-style {
+      dialog[open] {
+        opacity: 1;
+        translate: 0 100%;
+      }
+    }
+
+    /* Tijdens het slepen volgt het paneel de vinger (zie contact-drawer.ts). */
+    dialog[data-dragging] {
+      transition: none;
+    }
+
+    dialog::backdrop {
+      background: rgb(0 0 0 / 0);
+      transition:
+        background-color 0.4s ease,
+        overlay 0.4s allow-discrete,
+        display 0.4s allow-discrete;
+    }
+
+    dialog[open]::backdrop {
+      background: rgb(0 0 0 / 0.2);
+    }
+
+    @starting-style {
+      dialog[open]::backdrop {
+        background: rgb(0 0 0 / 0);
+      }
+    }
+
+    .panel {
+      height: auto;
+      max-height: inherit;
+    }
+
+    /* Figma: 80x4, #d9d9d9, ronde uiteinden, 20px van de bovenkant. */
+    .handle {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      display: block;
+      width: 80px;
+      height: 4px;
+      border-radius: 9999px;
+      background: #d9d9d9;
+      translate: -50% 0;
+    }
+
+    /* Figma: 26px van de rechterrand, 34px van de onderkant. */
+    .illustration {
+      margin-right: 26px;
+      margin-bottom: 34px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    dialog,
+    dialog::backdrop {
       transition: none;
     }
   }
