@@ -22,6 +22,11 @@ export const nl = {
   'case.agency': 'Agency:',
   'case.work': 'Werk:',
   'chapters.label': 'Hoofdstukken',
+  // 404
+  'notFound.title': 'Pagina niet gevonden',
+  'notFound.description': 'Deze pagina bestaat niet (meer).',
+  'notFound.body': 'De pagina die je zoekt bestaat niet of is verplaatst.',
+  'notFound.cta': 'Terug naar Home',
   // nav
   'nav.label': 'Hoofdnavigatie',
 } as const;

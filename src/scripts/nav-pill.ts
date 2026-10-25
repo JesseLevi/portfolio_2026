@@ -52,7 +52,9 @@ function setup(nav: HTMLElement) {
       const on = id === active;
       el.dataset.active = String(on);
       if (id === 'home') {
-        if (on) el.setAttribute('aria-current', 'page');
+        // Alleen op de route `/`: op een case is Home wel gemarkeerd, maar niet de huidige pagina.
+        if (on && location.pathname === '/')
+          el.setAttribute('aria-current', 'page');
         else el.removeAttribute('aria-current');
       } else if (id === 'contact') {
         // Geen `page`: Contact is een knop, geen pagina.

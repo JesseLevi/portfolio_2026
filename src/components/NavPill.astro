@@ -7,6 +7,9 @@ import type { IconName } from './Icon.astro';
 import { getLocale, t } from '../i18n';
 
 const locale = getLocale(Astro.currentLocale);
+// `aria-current="page"` alleen op Home zelf; de nav blijft staan tussen pagina's
+// (transition:persist), dus nav-pill.ts werkt het bij op astro:page-load.
+const onHome = Astro.url.pathname === '/';
 
 // `Over` linkt voorlopig nergens heen (pagina komt later): <span>, wel met hover-cirkel.
 const items: {
@@ -31,7 +34,7 @@ const items: {
   aria-label={t('nav.label', locale)}
   transition:persist
   style="view-transition-name: nav-pill; --nav-ease: cubic-bezier(0.22, 1, 0.36, 1); bottom: var(--nav-pill-bottom); transform: translateY(var(--nav-pill-y, 0px));"
-  class="fixed left-1/2 z-50 -translate-x-1/2 [--nav-pill-bottom:24px] md:[--nav-pill-bottom:40px]"
+  class="fixed left-1/2 z-50 -translate-x-1/2"
 >
   <div class="shadow-pill bg-paper relative h-12 rounded-full p-2">
     <span
@@ -48,7 +51,9 @@ const items: {
             <Tag
               data-nav-item={id}
               data-active={active ? 'true' : 'false'}
-              {...(Tag === 'a' ? { href: '/', 'aria-current': 'page' } : {})}
+              {...(Tag === 'a'
+                ? { href: '/', ...(onHome ? { 'aria-current': 'page' } : {}) }
+                : {})}
               {...(Tag === 'button'
                 ? { type: 'button', 'data-open-contact': '' }
                 : {})}

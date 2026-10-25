@@ -19,4 +19,11 @@ export default defineConfig(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...astro.configs.recommended,
+  {
+    // Node-scripts (geen bundler): globals handmatig, zonder extra pakket.
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: { process: 'readonly', Buffer: 'readonly', console: 'readonly' },
+    },
+  },
 );

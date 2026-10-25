@@ -127,6 +127,25 @@
   animation: none;
 }
 
+/*
+ * Onderkant van de pil: 24px in de mobiele layout, 40px in de desktoplayout. De layouts
+ * wisselen per pagina van breakpoint: Home op `lg` (1024, paneel vast onderin tot dan),
+ * de case op `md` (768, pil bij de hero). Daarom volgt de offset de pagina, niet één breakpoint.
+ */
+[data-nav-pill] {
+  --nav-pill-bottom: 24px;
+}
+@media (min-width: 1024px) {
+  [data-nav-pill] {
+    --nav-pill-bottom: 40px;
+  }
+}
+@media (min-width: 768px) {
+  html:has([data-case-hero]) [data-nav-pill] {
+    --nav-pill-bottom: 40px;
+  }
+}
+
 /* Het blok is een egale kleur: rek het mee met de groep (geen letterboxing). */
 ::view-transition-old(case-block),
 ::view-transition-new(case-block) {

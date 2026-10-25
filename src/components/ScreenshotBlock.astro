@@ -12,6 +12,8 @@ interface Props {
   /** Geef ratio en radius van het blok hier mee. */
   class?: string;
   sizes?: string;
+  /** LCP-afbeelding: eager laden met hoge fetchpriority. De rest blijft lazy. */
+  priority?: boolean;
 }
 
 const {
@@ -22,7 +24,11 @@ const {
   inset = 'panel',
   class: className,
   sizes,
+  priority = false,
 } = Astro.props;
+const loadingProps = priority
+  ? { loading: 'eager' as const, fetchpriority: 'high' as const }
+  : {};
 
 const contained = fit === 'contained';
 const widths = contained ? [480, 720, 1080, 1440] : [640, 1026, 1440, 2052];
@@ -51,6 +57,7 @@ const imgSizes =
         formats={['avif', 'webp']}
         widths={widths}
         sizes={imgSizes}
+        {...loadingProps}
         class="shadow-shot block h-auto w-full rounded-lg"
       />
     </div>
@@ -61,6 +68,7 @@ const imgSizes =
       formats={['avif', 'webp']}
       widths={widths}
       sizes={imgSizes}
+      {...loadingProps}
       class="absolute inset-0 size-full object-cover"
     />
   )}
