@@ -46,6 +46,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
 }
 
 /*
