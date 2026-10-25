@@ -1,21 +1,26 @@
 ---
 // Hoofdstuk-indicator (Figma 6169:28392 rust, 6166:26783 hover). Gedrag: src/scripts/chapter-nav.ts.
 // Streepjes 3px dik met 12px hartafstand; het hitgebied is 12px hoog (de volle cel).
-// Server-side gerenderd uit de header (opening, opdracht) en de blokken; zichtbaar vanaf de top.
+// Server-side gerenderd uit de header (opening, opdracht) en de blokken; onzichtbaar tot het
+// hoofdstuk `visibleFrom` (de opdracht) het midden bereikt.
 import { getLocale, t } from '../../i18n';
 
 interface Props {
   chapters: { id: string; name: string }[];
+  /** Id van het hoofdstuk vanaf waar de indicator zichtbaar is. */
+  visibleFrom: string;
 }
 
-const { chapters } = Astro.props;
+const { chapters, visibleFrom } = Astro.props;
 const locale = getLocale(Astro.currentLocale);
 ---
 
 <nav
   data-chapter-nav
+  data-visible-from={visibleFrom}
+  data-visible="false"
   aria-label={t('chapters.label', locale)}
-  class="fixed top-1/2 right-6 z-40 hidden -translate-y-1/2 lg:block"
+  class="invisible fixed top-1/2 right-6 z-40 hidden -translate-y-1/2 opacity-0 transition-[opacity,visibility] duration-300 data-[visible=true]:visible data-[visible=true]:opacity-100 lg:block"
 >
   <ol>
     {chapters.map(({ id, name }, i) => (
