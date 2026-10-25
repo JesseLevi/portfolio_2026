@@ -1,3 +1,73 @@
 ---
-// Nav-pil (Home / Over / Contact): wordt gebouwd in #5. Staat in BaseLayout.
+// Nav-pil (Figma 6169:27693). Gedrag: src/scripts/nav-pill.ts.
+// Animatiekeuze: 300ms met cubic-bezier(0.22, 1, 0.36, 1) (ease-out-quart, rustig
+// en zonder overshoot) voor de cirkel, de label-kolom (0fr -> 1fr), de opacity en de padding.
+import Icon from './Icon.astro';
+import type { IconName } from './Icon.astro';
+import { getLocale, t } from '../i18n';
+
+const locale = getLocale(Astro.currentLocale);
+
+// `Over` linkt voorlopig nergens heen (pagina komt later): <span>, wel met hover-cirkel.
+const items: {
+  id: 'home' | 'about' | 'contact';
+  icon: IconName;
+  label: string;
+  tag: 'a' | 'span' | 'button';
+}[] = [
+  { id: 'home', icon: 'home', label: t('nav.home', locale), tag: 'a' },
+  { id: 'about', icon: 'person', label: t('nav.about', locale), tag: 'span' },
+  {
+    id: 'contact',
+    icon: 'send',
+    label: t('nav.contact', locale),
+    tag: 'button',
+  },
+];
 ---
+
+<nav
+  data-nav-pill
+  aria-label={t('nav.label', locale)}
+  transition:persist
+  style="--nav-ease: cubic-bezier(0.22, 1, 0.36, 1); bottom: var(--nav-pill-bottom);"
+  class="fixed left-1/2 z-50 -translate-x-1/2 [--nav-pill-bottom:24px] md:[--nav-pill-bottom:40px]"
+>
+  <div class="shadow-pill bg-paper relative h-12 rounded-full p-2">
+    <span
+      data-nav-circle
+      aria-hidden="true"
+      style="transform: translateX(8px)"
+      class="bg-pill pointer-events-none absolute top-2 left-0 h-8 w-[78px] rounded-full transition-[transform,width] duration-300 ease-(--nav-ease) will-change-transform"
+    ></span>
+    <ul class="flex items-center gap-2">
+      {items.map(({ id, icon, label, tag: Tag }) => {
+        const active = id === 'home';
+        return (
+          <li class="relative z-10">
+            <Tag
+              data-nav-item={id}
+              data-active={active ? 'true' : 'false'}
+              {...(Tag === 'a' ? { href: '/', 'aria-current': 'page' } : {})}
+              {...(Tag === 'button'
+                ? { type: 'button', 'data-open-contact': '' }
+                : {})}
+              class="group/item text-label focus-visible:outline-ink text-muted data-[active=true]:text-ink flex h-8 items-center justify-center rounded-full px-2 transition-[padding] duration-300 ease-(--nav-ease) focus-visible:outline-2 focus-visible:outline-offset-2 data-[active=true]:px-3"
+            >
+              <Icon name={icon} />
+              <span class="grid grid-cols-[0fr] opacity-0 transition-[grid-template-columns,opacity] duration-300 ease-(--nav-ease) group-data-[active=true]/item:grid-cols-[1fr] group-data-[active=true]/item:opacity-100">
+                <span class="min-w-0 overflow-hidden" data-nav-label>
+                  <span class="block pl-1 whitespace-nowrap">{label}</span>
+                </span>
+              </span>
+            </Tag>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</nav>
+
+<script>
+  import '../scripts/nav-pill.ts';
+</script>
