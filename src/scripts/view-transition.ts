@@ -13,6 +13,7 @@
 const CASE_PATH = /^\/werk\/([^/]+)\/?$/;
 
 let returnSlug: string | null = null;
+let transitionDone: Promise<unknown> = Promise.resolve();
 
 /** Slug van de case waar we net vandaan komen (of '' = geen morph), eenmalig. */
 export function consumeReturnSlug(): string | null {
@@ -20,6 +21,15 @@ export function consumeReturnSlug(): string | null {
   returnSlug = null;
   return slug;
 }
+
+/** Voer `fn` uit zodra de lopende overgang (inclusief animaties) klaar is. */
+export function afterTransition(fn: () => void): void {
+  void transitionDone.then(fn);
+}
+
+document.addEventListener('astro:before-swap', (e) => {
+  transitionDone = e.viewTransition.finished.catch(() => undefined);
+});
 
 document.addEventListener('astro:before-preparation', (e) => {
   const { to } = e;
