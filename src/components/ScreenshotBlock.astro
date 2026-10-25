@@ -1,0 +1,67 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  image: ImageMetadata;
+  alt: string;
+  color?: string;
+  fit?: 'contained' | 'full-bleed';
+  /** Breedte van de screenshot als deel van het blok: panel 72% (Home), block 61.6% (case). */
+  inset?: 'panel' | 'block';
+  /** Geef ratio en radius van het blok hier mee. */
+  class?: string;
+  sizes?: string;
+}
+
+const {
+  image,
+  alt,
+  color = '#efefef',
+  fit = 'contained',
+  inset = 'panel',
+  class: className,
+  sizes,
+} = Astro.props;
+
+const contained = fit === 'contained';
+const widths = contained ? [480, 720, 1080, 1440] : [640, 1026, 1440, 2052];
+const imgSizes =
+  sizes ??
+  (contained
+    ? inset === 'panel'
+      ? '(min-width: 1024px) 520px, 72vw'
+      : '(min-width: 1024px) 640px, 62vw'
+    : '(min-width: 1080px) 1026px, 100vw');
+---
+
+<div
+  class:list={[
+    'relative overflow-hidden',
+    contained && 'flex items-center justify-center',
+    className,
+  ]}
+  style={{ backgroundColor: color }}
+>
+  {contained ? (
+    <div class={inset === 'panel' ? 'w-[72%]' : 'w-[61.6%]'}>
+      <Picture
+        src={image}
+        alt={alt}
+        formats={['avif', 'webp']}
+        widths={widths}
+        sizes={imgSizes}
+        class="shadow-shot block h-auto w-full rounded-lg"
+      />
+    </div>
+  ) : (
+    <Picture
+      src={image}
+      alt={alt}
+      formats={['avif', 'webp']}
+      widths={widths}
+      sizes={imgSizes}
+      class="absolute inset-0 size-full object-cover"
+    />
+  )}
+</div>
