@@ -39,7 +39,7 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 - Tekstblok: volle breedte, links uitgelijnd, 16px van de rand.
 - Kleur is in te stellen per blok (`color`). De kleur van de hero is ook de kleur van het paneel op Home.
 - De knop Expertise en het persoonsicoon in de nav linken voorlopig nergens heen; de pagina "Over" komt later.
-- Drawer op mobiel: hetzelfde paneel als op desktop, op elke rand 16px vrij.
+- Drawer op mobiel (onder `lg`): een pull-up panel over de volle breedte, vast aan de onderkant, radius 32 bovenaan, met grip en 20% zwarte waas. Omlaag vegen sluit hem.
 - Geen eindeloze lus op touch (2026-10-25): op iOS Safari ging er te veel mis. De lus staat alleen aan bij `pointer: fine`.
 
 ## Toegankelijkheid
