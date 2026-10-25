@@ -190,10 +190,14 @@ function enableLoop(restoreY?: number): (restore: boolean) => void {
   clone.setAttribute('data-home-loop-clone', '');
   clone.setAttribute('aria-hidden', 'true');
   clone.inert = true;
-  // Minstens een viewport hoog, zodat de kopie-intro exact op 0 kan komen. lvh:
-  // op iOS is de viewport groter zodra de balken inklappen; met svh haalt de
-  // scroll dan de beginstaat van de kopie niet en springt de lus nooit terug.
-  clone.style.minHeight = '100lvh';
+  // Onderruimte zoals bij het origineel: ook de laatste kopie-titel haalt de
+  // snaplijn, dus de kopie is minstens een viewport hoog (de kopie-intro kan
+  // exact op 0 komen) en het luspunt is niet het einde van de pagina. Op iOS
+  // botste de veeg anders tegen die onderkant: Safari klapte de werkbalk weer
+  // uit (de pagina flitste omlaag) en je kwam niet verder dan de tweede
+  // kopie-titel. lvh: de grootste viewport, met ingeklapte balken.
+  clone.style.paddingBottom =
+    'max(0px, calc(100lvh - var(--intro-h, 0px) - var(--last-h, 0px)))';
 
   const introCopy = introEl.cloneNode(true) as HTMLElement;
   introCopy.removeAttribute('data-home-intro');
@@ -263,9 +267,8 @@ function enableLoop(restoreY?: number): (restore: boolean) => void {
     if (y < start - 2) return;
     window.scrollTo({ top: Math.max(0, y - start), behavior: 'instant' });
   };
-  // Touch: nooit springen terwijl er een vinger op het scherm ligt. iOS negeert
-  // de sprong dan of verspringt onder de vinger. Na het loslaten (en het
-  // uitrollen en snappen) volgt `scrollend` of de idle-terugval.
+  // Touch: de idle-terugval springt niet terwijl er een vinger op het scherm
+  // ligt (iOS negeert de sprong dan of verspringt onder de vinger).
   let touching = false;
   const onTouchStart = () => {
     touching = true;
@@ -273,12 +276,9 @@ function enableLoop(restoreY?: number): (restore: boolean) => void {
   const onTouchEnd = (e: TouchEvent) => {
     if (e.touches.length > 0) return;
     touching = false;
-    // Zonder `scrollend`: staat de pagina al stil (geen scroll-events meer),
-    // dan start alleen het loslaten de timer.
-    if (!hasScrollEnd) onScrollIdle();
-  };
-  const wrap = () => {
-    if (!touching) jump();
+    // Staat de pagina al stil (geen scroll-events meer), dan start alleen het
+    // loslaten de timer.
+    onScrollIdle();
   };
   // Van de laatste titel naar de kopie-intro is één scherm (intro + titel). Eén
   // wieltik haalt de halve afstand niet, en dan snapt de browser terug. Daarom
@@ -325,19 +325,27 @@ function enableLoop(restoreY?: number): (restore: boolean) => void {
   window.addEventListener('wheel', onWheel, { passive: true });
 
   // Na het scrollen: terugspringen als de kopie bereikt is. Is de brug
-  // onderbroken (geen sprong), dan vervalt hij hier ook. Zonder `scrollend`
-  // telt een pauze in de scroll-events als einde.
+  // onderbroken (geen sprong), dan vervalt hij hier ook. `scrollend` komt pas
+  // na het loslaten, dus dan ligt er geen vinger meer. Daarnaast telt altijd een
+  // pauze in de scroll-events als einde: zonder `scrollend` is dat de enige
+  // trigger, en op iOS het vangnet als `scrollend` uitblijft.
   const onScrollEnd = () => {
-    wrap();
+    touching = false;
+    jump();
     endBridge();
   };
   let idle: number | undefined;
+  const onIdle = () => {
+    if (touching) return;
+    jump();
+    if (!hasScrollEnd) endBridge();
+  };
   const onScrollIdle = () => {
     window.clearTimeout(idle);
-    idle = window.setTimeout(onScrollEnd, SCROLL_IDLE_MS);
+    idle = window.setTimeout(onIdle, SCROLL_IDLE_MS);
   };
   if (hasScrollEnd) window.addEventListener('scrollend', onScrollEnd);
-  else window.addEventListener('scroll', onScrollIdle, { passive: true });
+  window.addEventListener('scroll', onScrollIdle, { passive: true });
   window.addEventListener('touchstart', onTouchStart, { passive: true });
   window.addEventListener('touchend', onTouchEnd, { passive: true });
   window.addEventListener('touchcancel', onTouchEnd, { passive: true });
