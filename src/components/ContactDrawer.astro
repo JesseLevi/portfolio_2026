@@ -12,17 +12,18 @@ const locale = getLocale(Astro.currentLocale);
 ---
 
 <dialog id="contact-drawer" aria-labelledby="contact-drawer-title">
-  <div class="panel">
-    <span class="handle" aria-hidden="true"></span>
-    <button
-      type="button"
-      class="close"
-      data-close-contact
-      aria-label={t('contact.close', locale)}
-    >
-      <Icon name="close" size={20} />
-    </button>
+  <!-- Grip en sluitknop staan buiten `.panel`, zodat ze vast blijven terwijl de inhoud scrollt. -->
+  <span class="handle" aria-hidden="true"></span>
+  <button
+    type="button"
+    class="close"
+    data-close-contact
+    aria-label={t('contact.close', locale)}
+  >
+    <Icon name="close" size={20} />
+  </button>
 
+  <div class="panel">
     <div class="content">
       <h2 id="contact-drawer-title" class="text-heading">
         {t('contact.title', locale)}
@@ -155,7 +156,7 @@ const locale = getLocale(Astro.currentLocale);
     position: absolute;
     top: 20px;
     right: 20px;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -249,12 +250,24 @@ const locale = getLocale(Astro.currentLocale);
       max-height: inherit;
     }
 
-    /* Figma: 80x4, #d9d9d9, ronde uiteinden, 20px van de bovenkant. */
+    /*
+     * Figma "Pull up bar": 32px hoog, wit, vast bovenaan. Overlopende inhoud
+     * scrolt erachter langs. De grip is 80x4, #d9d9d9, met ronde uiteinden.
+     */
     .handle {
       position: absolute;
-      top: 18px;
-      left: 50%;
+      inset: 0 0 auto;
+      z-index: 1;
       display: block;
+      height: 32px;
+      background: var(--color-paper);
+    }
+
+    .handle::after {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 50%;
       width: 80px;
       height: 4px;
       border-radius: 9999px;
