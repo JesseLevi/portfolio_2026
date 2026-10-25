@@ -25,6 +25,8 @@ const SCROLL_IDLE_MS = 150;
 const BRIDGE_THRESHOLD = 0.35;
 /** Pauze in de wielinvoer (ms) waarna de opgetelde afstand vervalt. */
 const BRIDGE_RESET_MS = 400;
+/** Mobiele layout (paneel vast onderin), tot de `lg`-breakpoint. */
+const MOBILE_QUERY = '(max-width: 1023px)';
 
 export interface HomeItem {
   index: number;
@@ -204,12 +206,35 @@ function enableLoop(): (restore: boolean) => void {
   root.setAttribute(LOOP_ATTR, '');
   syncCloneActive();
 
+  // Mobiel: boven de kopie-intro horen geen titels. Zodra de laatste titel de
+  // snaplijn verlaat, vervaagt de originele lijst; als de kopie-intro de
+  // snaplijn bereikt (één titelhoogte later) is hij weg.
+  const mobileMq = window.matchMedia(MOBILE_QUERY);
+  const list0 = list;
+  let fadeRaf = 0;
+  const fade = () => {
+    fadeRaf = 0;
+    const range = getItems().at(-1)?.title.offsetHeight ?? 0;
+    const rest = clone.getBoundingClientRect().top - snapLine();
+    const opacity =
+      mobileMq.matches && range > 0
+        ? Math.min(1, Math.max(0, rest / range))
+        : 1;
+    list0.style.opacity = opacity < 1 ? String(opacity) : '';
+  };
+  const onFadeScroll = () => {
+    if (!fadeRaf) fadeRaf = requestAnimationFrame(fade);
+  };
+  window.addEventListener('scroll', onFadeScroll, { passive: true });
+  mobileMq.addEventListener('change', fade);
+
   /** Spring terug zodra de kopie op de plek van het origineel staat. */
   const wrap = () => {
     const start = clone.getBoundingClientRect().top + window.scrollY;
     const y = window.scrollY;
     if (y < start - 2) return;
     window.scrollTo({ top: Math.max(0, y - start), behavior: 'instant' });
+    fade(); // direct, anders staat het origineel één frame onzichtbaar
   };
   // Van de laatste titel naar de kopie-intro is één scherm (intro + titel). Eén
   // wieltik haalt de halve afstand niet, en dan snapt de browser terug. Daarom
@@ -270,6 +295,10 @@ function enableLoop(): (restore: boolean) => void {
     window.removeEventListener('scrollend', wrap);
     window.removeEventListener('scroll', onScrollIdle);
     window.clearTimeout(idle);
+    window.removeEventListener('scroll', onFadeScroll);
+    mobileMq.removeEventListener('change', fade);
+    cancelAnimationFrame(fadeRaf);
+    list0.style.opacity = '';
     // Sta je op de kopie (zelfde beeld), ga dan eerst naar het origineel.
     if (restore) wrap();
     clone.remove();
