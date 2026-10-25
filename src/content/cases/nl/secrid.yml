@@ -9,7 +9,7 @@ work: |-
 hero:
   image: ../../../assets/cases/secrid-hero.png
   alt: Placeholder-beschrijving van de hero van Secrid
-  color: '#c9dde6'
+  color: '#efefef'
 blocks:
   - type: image
     chapter: Iconen

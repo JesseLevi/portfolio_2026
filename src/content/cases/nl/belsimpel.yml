@@ -9,7 +9,7 @@ work: |-
 hero:
   image: ../../../assets/cases/belsimpel-hero.png
   alt: Placeholder-beschrijving van de hero van Belsimpel
-  color: '#ffe3cf'
+  color: '#efefef'
 blocks:
   - type: image
     chapter: Iconen

@@ -9,7 +9,7 @@ work: |-
 hero:
   image: ../../../assets/cases/adyen-hero.png
   alt: Placeholder-beschrijving van de hero van Adyen
-  color: '#cfe8da'
+  color: '#efefef'
 blocks:
   - type: image
     chapter: Iconen

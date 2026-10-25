@@ -9,7 +9,7 @@ work: |-
 hero:
   image: ../../../assets/cases/suitsupply-hero.png
   alt: Placeholder-beschrijving van de hero van Suitsupply
-  color: '#d8d2c8'
+  color: '#efefef'
 blocks:
   - type: image
     chapter: Iconen
