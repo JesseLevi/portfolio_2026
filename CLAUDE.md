@@ -18,6 +18,14 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 - De annotaties (`node.annotations`) zijn de spec voor gedrag.
 - De frame "About" (`6169:27104`) is eigenlijk de **mobiele case-pagina**. Een pagina "Over" is nog niet ontworpen.
 - De mockups in de frames worden op de site gewone afbeeldingen.
+- **De Figma wordt nog bijgewerkt en gaat altijd voor.** Meet bij elk ticket opnieuw; maten in issues kunnen verouderd zijn (de avatar-ring is bijvoorbeeld `#f2f2f2` geworden).
+
+## Afspraken in de code
+
+- Routes: Home `/`, case `/werk/<slug>`. Engels later onder `/en/...`.
+- `BaseLayout` heeft de props `title`, `description` en `noindex`, plus een slot `head`. `NavPill` en `ContactDrawer` staan al in de layout; pagina's plaatsen ze niet zelf.
+- Elk element met het attribuut `data-open-contact` opent de contact-drawer.
+- Screenshots in parallelle worktrees: draai `scratchpad/shot.sh` van de orchestrator (een lock op poort 4329), niet `pnpm screenshot` direct.
 
 ## Ontwerpbeslissingen (Jesse, 2026-10-25)
 

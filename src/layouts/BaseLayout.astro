@@ -1,15 +1,18 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import { Font } from 'astro:assets';
+import NavPill from '../components/NavPill.astro';
+import ContactDrawer from '../components/ContactDrawer.astro';
 import { getLocale } from '../i18n';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description: string;
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false } = Astro.props;
 const locale = getLocale(Astro.currentLocale);
 ---
 
@@ -18,11 +21,15 @@ const locale = getLocale(Astro.currentLocale);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <title>{title}</title>
     <Font cssVariable="--font-inter" preload={[{ subset: 'latin' }]} />
     <ClientRouter />
+    <slot name="head" />
   </head>
   <body>
     <slot />
+    <NavPill />
+    <ContactDrawer />
   </body>
 </html>
