@@ -49,7 +49,7 @@ content:
         type: text
         required: true
       - name: hero
-        label: Hero
+        label: Openingsbeeld
         type: object
         required: true
         fields:

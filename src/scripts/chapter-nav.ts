@@ -1,7 +1,7 @@
 // Gedrag van de hoofdstuk-indicator.
-// Zichtbaar zodra het eerste hoofdstuk het midden van de viewport bereikt (de hero is dan
-// voorbij); weer weg als het eerste blok onder het midden terugzakt. Actief is het blok
-// dat het midden bereikt heeft en als laatste begon.
+// De eerste hoofdstukken zijn het openingsbeeld en de opdracht (titel en meta), dus de
+// indicator is er vanaf de bovenkant van de pagina. Actief is het hoofdstuk dat het midden
+// van de viewport bereikt heeft en als laatste begon; daarvoor het eerste.
 
 let cleanup: (() => void) | null = null;
 
@@ -19,14 +19,13 @@ function init() {
   );
   if (sections.some((s) => !s)) return;
 
-  // Actief = het laatste blok waarvan de bovenrand op of boven het midden ligt.
+  // Actief = het laatste hoofdstuk waarvan de bovenrand op of boven het midden ligt.
   const render = () => {
     const mid = window.innerHeight / 2;
-    let active = -1;
+    let active = 0;
     sections.forEach((s, i) => {
       if (s!.getBoundingClientRect().top <= mid) active = i;
     });
-    nav.dataset.visible = String(active >= 0);
     links.forEach((a, i) => {
       a.dataset.active = String(i === active);
       if (i === active) a.setAttribute('aria-current', 'true');
