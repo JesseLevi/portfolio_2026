@@ -32,7 +32,7 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 ## Ontwerpbeslissingen (Jesse, 2026-10-25)
 
 - Grijze tekst blijft `#949494`, ook bij kleine tekst.
-- Blokratio 5:3. Een dubbel blok is een 5:3-container met twee kolommen en 8px gap.
+- Blokratio 5:3. Een dubbel blok zijn twee kolommen met 8px gap, elke helft 4:5 (2026-10-25).
 - Screenshot: radius 8 en vaste schaduw, overal hetzelfde (niet meeschalen).
 - **Home:** de lijst met casetitels is één blok, zo breed als de breedste titel, gecentreerd in de linkerkolom. De intro (avatar, naam, knoppen) lijnt links uit op dat blok.
 - **Case:** de titel staat altijd gecentreerd ten opzichte van de viewport. De meta-kolom loopt van de linkerkant van de titel tot de rechterrand van de container.
