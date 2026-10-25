@@ -6,6 +6,8 @@
 // Haakpunten voor #13 en #14: getItems(), getActiveIndex(), setActive(i),
 // scrollToItem(i) en het document-event `home-active` (detail: { index, slug }).
 
+import { consumeReturnSlug } from './view-transition.ts';
+
 const SNAP_ATTR = 'data-home-snap';
 const REDUCED = '(prefers-reduced-motion: reduce)';
 
@@ -54,6 +56,32 @@ export function getActiveIndex(): number {
   return activeIndex;
 }
 
+/** Gedeelde elementen van de overgang Home -> case: het blok en de screenshot. */
+function setTransitionNames(panel: HTMLElement, on: boolean) {
+  panel.style.viewTransitionName = on ? 'case-block' : '';
+  const shot = panel.querySelector<HTMLElement>('[data-shot]');
+  if (shot) shot.style.viewTransitionName = on ? 'case-shot' : '';
+}
+
+/**
+ * Voor een klik op een niet-actieve titel of afbeelding: maak dat item direct
+ * actief (zonder fades, anders legt de transitie een halve opacity vast) en
+ * scrol het naar de snaplijn, zodat de scrollpositie in de history klopt bij terug.
+ */
+function onLeave(e: Event) {
+  const slug = (e as CustomEvent<{ slug: string }>).detail.slug;
+  const target = getItems().find((i) => i.slug === slug);
+  if (!target || target.index === activeIndex) return;
+  for (const item of getItems()) {
+    item.title.style.transition = 'none';
+    if (item.panel) item.panel.style.transition = 'none';
+  }
+  if (panelRoot) panelRoot.style.transition = 'none';
+  setActive(target.index);
+  scrollToItem(target.index, false);
+  void document.body.offsetWidth; // reflow: de stijlwissel gebeurt zonder fade
+}
+
 /** Hoogte van de intro = y van de snaplijn (viewportcoördinaat). */
 function snapLine(): number {
   return introEl?.getBoundingClientRect().height ?? 0;
@@ -70,6 +98,8 @@ export function setActive(index: number): void {
     item.title.toggleAttribute('data-active', on);
     if (item.panel) {
       item.panel.toggleAttribute('data-active', on);
+      // View Transition (#13): de namen staan alleen op het actieve item.
+      setTransitionNames(item.panel, on);
       // Het paneel is geen tabstop (de titel is het toetsenbordpad) en
       // alleen de zichtbare afbeelding hoort in de toegankelijkheidsboom.
       item.panel.setAttribute('tabindex', '-1');
@@ -165,9 +195,22 @@ function setup(): () => void {
   window.addEventListener('scrollend', endPending);
   window.addEventListener('resize', onScroll);
   list?.addEventListener('focusin', onFocusIn);
+  document.addEventListener('home-leave', onLeave);
 
   activeIndex = -1;
   setActive(closestIndex());
+
+  // Terug van een case: alleen morphen naar het paneel van die case. Staat Home
+  // bij een ander item (Home-link: begint bovenaan), dan vervalt de morph en
+  // blijft er een crossfade over.
+  const returning = consumeReturnSlug();
+  if (returning !== null) {
+    for (const item of getItems()) {
+      if (item.panel && item.slug !== returning) {
+        setTransitionNames(item.panel, false);
+      }
+    }
+  }
 
   const currentList = list;
   return () => {
@@ -175,6 +218,7 @@ function setup(): () => void {
     window.removeEventListener('scrollend', endPending);
     window.removeEventListener('resize', onScroll);
     currentList?.removeEventListener('focusin', onFocusIn);
+    document.removeEventListener('home-leave', onLeave);
     ro.disconnect();
     cancelAnimationFrame(raf);
     window.clearTimeout(pendingTimer);
