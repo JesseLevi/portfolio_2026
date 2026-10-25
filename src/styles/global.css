@@ -184,8 +184,17 @@
 [data-nav-pill] {
   --nav-pill-bottom: 24px;
 }
+/*
+ * Home mobiel: in Figma staat de pil 24px boven de fold. Achter de werkbalk van iOS
+ * Safari is hij niet te bedienen, dus zakt hij alleen zo ver als die werkbalk
+ * (100lvh - 100dvh) toelaat, met minstens 8px ruimte.
+ */
+html:has([data-case-panel]) [data-nav-pill] {
+  --nav-pill-bottom: max(8px, calc(24px - (100lvh - 100dvh)));
+}
 @media (min-width: 1024px) {
-  [data-nav-pill] {
+  [data-nav-pill],
+  html:has([data-case-panel]) [data-nav-pill] {
     --nav-pill-bottom: 40px;
   }
 }

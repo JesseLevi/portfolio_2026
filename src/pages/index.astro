@@ -22,14 +22,17 @@ const cases = await getCases(locale);
     lus-modus (#14, html[data-home-loop]) vervalt die ruimte: de kopie van intro
     + lijst achter de lijst (home-scroll.ts) levert haar.
   -->
-  <main class="grid [--panel-h:min(400px,46svh)] lg:grid-cols-2">
+  <main class="grid [--panel-h:min(400px,46lvh)] lg:grid-cols-2">
     <h1 class="sr-only">{t('home.title', locale)}</h1>
     <div
       data-home-col
       class="px-6 pb-[max(0px,calc(100svh-var(--intro-h,0px)-var(--last-h,0px)))] lg:mx-auto lg:w-max lg:max-w-full"
     >
       <div data-home-intro>
-        <Intro align="start" class="py-12 lg:h-100 lg:justify-center lg:py-0" />
+        <Intro
+          align="start"
+          class="pt-6 pb-12 lg:h-100 lg:justify-center lg:py-0"
+        />
       </div>
       <CaseList cases={cases} label={t('home.cases', locale)} />
     </div>

@@ -29,8 +29,8 @@ const centered = align === 'center';
   >
     <div class="text-heading flex flex-col gap-1.5">
       <p>{t('site.name', locale)}</p>
-      <!-- Figma (402): de rol is 359 breed in 354 ruimte en steekt iets in de gutter; zonder -me-2 breekt hij af. -->
-      <p class:list={['text-muted', !centered && '-me-2']}>
+      <!-- Figma (402): de rol is 359 breed in 354 ruimte en steekt in de gutter; Safari zet Inter iets breder, dus de hele gutter (-me-6), anders breekt hij af. -->
+      <p class:list={['text-muted', !centered && '-me-6']}>
         {t('site.role', locale)}
       </p>
     </div>
