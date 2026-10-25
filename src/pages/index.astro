@@ -15,15 +15,32 @@ const cases = await getCases(locale);
   description={t('home.description', locale)}
 >
   <!--
-    Linkerkolom = gewone documentscroll, paneel = sticky (desktop) of vast
-    onderin (mobiel). #8 voegt snap en de wissel toe.
+    Linkerkolom = documentscroll met scroll-snap per titel (html[data-home-snap],
+    gezet door home-scroll.ts); paneel = sticky (desktop) of vast onderin (mobiel).
+    Snaplijn = introhoogte (--intro-h, gemeten). De onderruimte laat ook de
+    laatste titel die lijn bereiken (--last-h = hoogte van het laatste item).
   -->
   <main class="grid [--panel-h:min(400px,46svh)] lg:grid-cols-2">
     <h1 class="sr-only">{t('home.title', locale)}</h1>
-    <div class="px-6 pb-(--panel-h) lg:mx-auto lg:w-max lg:max-w-full lg:pb-0">
-      <Intro align="start" class="py-12 lg:h-100 lg:justify-center lg:py-0" />
+    <div class="px-6 pb-[max(0px,calc(100svh-var(--intro-h,0px)-var(--last-h,0px)))] lg:mx-auto lg:w-max lg:max-w-full">
+      <div data-home-intro>
+        <Intro align="start" class="py-12 lg:h-100 lg:justify-center lg:py-0" />
+      </div>
       <CaseList cases={cases} label={t('home.cases', locale)} />
     </div>
     <CasePanel cases={cases} />
   </main>
 </BaseLayout>
+
+<script>
+  import '../scripts/home-scroll.ts';
+</script>
+
+<style is:global>
+  /* Snap alleen met bewegingsvoorkeur; bij reduced motion scrolt de pagina vrij. */
+  @media (prefers-reduced-motion: no-preference) {
+    html[data-home-snap] {
+      scroll-snap-type: y mandatory;
+    }
+  }
+</style>
