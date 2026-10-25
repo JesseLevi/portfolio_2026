@@ -1,10 +1,12 @@
 ---
 // Contact-drawer (native <dialog>). Staat in BaseLayout; elk element met
 // `data-open-contact` opent hem (gedrag in src/scripts/contact-drawer.ts).
-import { Image } from 'astro:assets';
 import Button from './Button.astro';
 import Icon from './Icon.astro';
-import illustration from '../assets/contact/illustration.png';
+// Getraceerd uit illustration.png met scripts/illustrations. Hoofd, koffiedamp en been
+// bewegen in de SVG zelf; bij reduced motion de stilstaande variant.
+import illustration from '../assets/contact/illustration.svg';
+import illustrationStatic from '../assets/contact/illustration-static.svg';
 import { siteConfig } from '../config';
 import { getLocale, t } from '../i18n';
 
@@ -64,14 +66,19 @@ const locale = getLocale(Astro.currentLocale);
       </section>
     </div>
 
-    <Image
-      src={illustration}
-      alt=""
-      width={290}
-      height={232}
-      densities={[1, 2, 3]}
-      class="illustration"
-    />
+    <picture class="contents">
+      <source
+        media="(prefers-reduced-motion: reduce)"
+        srcset={illustrationStatic.src}
+      />
+      <img
+        src={illustration.src}
+        alt=""
+        width="290"
+        height="232"
+        class="illustration"
+      />
+    </picture>
   </div>
 </dialog>
 
@@ -197,8 +204,6 @@ const locale = getLocale(Astro.currentLocale);
     height: auto;
     margin-top: auto;
     margin-bottom: 45px;
-    /* De PNG is #fefefe i.p.v. wit; multiply laat de rand niet zien. */
-    mix-blend-mode: multiply;
   }
 
   .handle {

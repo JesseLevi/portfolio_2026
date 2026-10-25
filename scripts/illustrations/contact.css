@@ -1,0 +1,170 @@
+/*
+ * Contact-drawer. Elk onderdeel heeft een eigen periode, zodat het geheel nooit in de maat loopt.
+ */
+
+/* Hoofd: kijkt naar de mok op tafel (en de lege kruk), terug, dan naar jou, terug. */
+.head,
+.face {
+  transform-box: view-box;
+  transform-origin: 262px 194px;
+  animation: 16s cubic-bezier(0.45, 0, 0.3, 1) infinite;
+}
+
+.head {
+  animation-name: head;
+}
+
+.face {
+  animation-name: face;
+}
+
+.eyeL,
+.eyeR {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 16s infinite;
+}
+
+@keyframes head {
+  0%,
+  16%,
+  41%,
+  52%,
+  82%,
+  100% {
+    transform: none;
+  }
+  22%,
+  36% {
+    transform: rotate(2deg);
+  }
+  58%,
+  76% {
+    transform: rotate(-2.5deg);
+  }
+}
+
+@keyframes face {
+  0%,
+  16%,
+  41%,
+  52%,
+  82%,
+  100% {
+    transform: none;
+  }
+  22%,
+  36% {
+    transform: translate(4px, 2px);
+  }
+  58%,
+  76% {
+    transform: translate(-6px, -1px);
+  }
+}
+
+@keyframes blink {
+  0%,
+  15.2%,
+  16.4%,
+  51.2%,
+  52.4%,
+  66%,
+  67.2%,
+  90%,
+  91.2%,
+  100% {
+    transform: none;
+  }
+  15.8%,
+  51.8%,
+  66.6%,
+  90.6% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* Koffiedamp: stijgt op, golft en vervaagt. */
+.steamA,
+.steamB,
+.steamC {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: steam 3.6s ease-in-out infinite;
+}
+
+.steamB {
+  animation-duration: 4.1s;
+  animation-delay: -1.6s;
+}
+
+.steamC {
+  animation-duration: 4.6s;
+  animation-delay: -2.9s;
+}
+
+@keyframes steam {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scaleY(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(0) skewX(-7deg);
+  }
+  65% {
+    opacity: 0.85;
+    transform: translateY(-5px) skewX(6deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-11px) scaleY(1.1);
+  }
+}
+
+/* Het gekruiste been zwaait rustig vanuit de knie; de voet wipt af en toe vanuit de enkel. */
+.shin {
+  transform-box: view-box;
+  transform-origin: 250px 372px;
+  animation: swing 4.4s ease-in-out infinite alternate;
+}
+
+.shoe {
+  transform-box: view-box;
+  transform-origin: 306px 508px;
+  animation: bob 6.2s ease-in-out infinite;
+}
+
+@keyframes swing {
+  from {
+    transform: rotate(0.6deg);
+  }
+  to {
+    transform: rotate(-1.1deg);
+  }
+}
+
+@keyframes bob {
+  0%,
+  46%,
+  84%,
+  100% {
+    transform: none;
+  }
+  54%,
+  59% {
+    transform: rotate(-3deg);
+  }
+  67% {
+    transform: rotate(-0.5deg);
+  }
+  74% {
+    transform: rotate(-2.2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
+}
