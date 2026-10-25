@@ -188,10 +188,10 @@ const locale = getLocale(Astro.currentLocale);
     outline-offset: 2px;
   }
 
-  /* Figma: 290x232, tegen de rechterrand, 45px van de onderkant. */
+  /* Figma: 290x232, 45px van de onderkant. Horizontaal gecentreerd (Jesse). */
   .illustration {
     flex: none;
-    align-self: flex-end;
+    align-self: center;
     width: 290px;
     max-width: 100%;
     height: auto;
@@ -284,9 +284,8 @@ const locale = getLocale(Astro.currentLocale);
       translate: -50% 0;
     }
 
-    /* Figma: 26px van de rechterrand, 34px van de onderkant. */
+    /* Figma: 34px van de onderkant. */
     .illustration {
-      margin-right: 26px;
       margin-bottom: 34px;
     }
   }
