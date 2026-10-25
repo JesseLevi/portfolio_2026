@@ -1,11 +1,11 @@
 // Eenmalig script: genereert public/og.png, favicon.svg, favicon-32.png en apple-touch-icon.png
 // uit src/assets/avatar.png. De uitvoer staat in de repo; draai dit alleen als de avatar of de tekst wijzigt.
-//   INTER_MEDIUM=/pad/naar/Inter-Medium.ttf node scripts/make-brand-assets.mjs
-// Zonder INTER_MEDIUM valt de tekst terug op een systeemfont (sans-serif).
-import { mkdirSync, writeFileSync } from 'node:fs';
+//   INTER_SEMIBOLD=/pad/naar/Inter-SemiBold.ttf INTER_MEDIUM=/pad/naar/Inter-Medium.ttf node scripts/make-brand-assets.mjs
+// De naam staat in SemiBold, de ondertitel in Medium. Zonder fonts valt de tekst terug op een systeemfont (sans-serif).
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
-const interPath = process.env.INTER_MEDIUM;
+const { INTER_SEMIBOLD, INTER_MEDIUM } = process.env;
 // sharp is een dependency van Astro en niet direct van dit project: laad hem via Astro.
 const fromAstro = createRequire(
   createRequire(import.meta.url).resolve('astro/package.json'),
@@ -29,17 +29,33 @@ const avatar = await sharp(avatarPath)
   .png()
   .toBuffer();
 const ring = circle(AV, 'fill="none" stroke="#f2f2f2" stroke-width="2"');
-// Tekst: met INTER_MEDIUM worden de glyphs als paden getekend (opentype.js, geen systeemfont nodig);
+// Tekst: met een fontbestand worden de glyphs als paden getekend (opentype.js, geen systeemfont nodig);
 // zonder valt hij terug op een SVG-<text> in een systeemfont.
-let font = null;
-if (interPath) {
-  const { default: opentype } = await import('opentype.js');
-  font = opentype.loadSync(interPath);
-}
-const line = (content, size, color, y) => {
+const { default: opentype } = await import('opentype.js');
+// opentype.loadSync geeft in v2 niets terug: parse de buffer zelf.
+const load = (path) =>
+  path ? opentype.parse(new Uint8Array(readFileSync(path)).buffer) : null;
+const semibold = load(INTER_SEMIBOLD);
+const medium = load(INTER_MEDIUM);
+// Glyph voor glyph met kerning: de shaping van opentype.js struikelt over de ccmp-lookups van Inter.
+const toPath = (font, content, size) => {
+  const scale = size / font.unitsPerEm;
+  let x = 0;
+  let prev = null;
+  const parts = [];
+  for (const char of content) {
+    const glyph = font.charToGlyph(char);
+    if (prev) x += font.getKerningValue(prev, glyph) * scale;
+    parts.push(glyph.getPath(x, size, size).toPathData(2));
+    x += glyph.advanceWidth * scale;
+    prev = glyph;
+  }
+  return parts.join('');
+};
+const line = (content, size, color, y, font, weight) => {
   const body = font
-    ? `<path fill="${color}" d="${font.getPath(content, 0, size, size).toPathData(2)}"/>`
-    : `<text y="${size}" font-family="sans-serif" font-weight="500" font-size="${size}" fill="${color}">${content}</text>`;
+    ? `<path fill="${color}" d="${toPath(font, content, size)}"/>`
+    : `<text y="${size}" font-family="sans-serif" font-weight="${weight}" font-size="${size}" fill="${color}">${content}</text>`;
   return sharp(
     Buffer.from(
       `<svg xmlns="http://www.w3.org/2000/svg" width="700" height="${Math.ceil(size * 1.4)}">${body}</svg>`,
@@ -49,8 +65,15 @@ const line = (content, size, color, y) => {
     .toBuffer()
     .then((input) => ({ input, left: 470, top: y }));
 };
-const name = await line('Jesse Kamps', 84, '#000000', 217);
-const role = await line('Designer voor web en identiteit', 42, '#949494', 335);
+const name = await line('Jesse Kamps', 84, '#000000', 228, semibold, 600);
+const role = await line(
+  'Designer voor web en identiteit',
+  42,
+  '#949494',
+  330,
+  medium,
+  500,
+);
 await sharp({
   create: { width: 1200, height: 630, channels: 3, background: '#ffffff' },
 })
