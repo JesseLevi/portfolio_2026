@@ -45,6 +45,33 @@
   }
 }
 
+/*
+ * Eigen cursor (Figma 6162:23206). Alleen een native CSS-cursor, geen JS.
+ * Canvas 28x28 px op 1x (pijl 24x30 plus schaduw), hotspot (4, 2) = de punt van de pijl.
+ * De PNG's staan op vaste URL's in public/cursor/; cursor.svg is de bron.
+ */
+@media (pointer: fine) {
+  html,
+  a,
+  button,
+  [role='button'],
+  label,
+  summary {
+    cursor:
+      url(/cursor/cursor.png) 4 2,
+      auto;
+    cursor:
+      image-set(url(/cursor/cursor.png) 1x, url(/cursor/cursor@2x.png) 2x) 4 2,
+      auto;
+  }
+
+  input,
+  textarea,
+  [contenteditable] {
+    cursor: auto;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
