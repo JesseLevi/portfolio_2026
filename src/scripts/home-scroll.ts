@@ -6,7 +6,9 @@
 // Haakpunten voor #13 en #14: getItems(), getActiveIndex(), setActive(i),
 // scrollToItem(i) en het document-event `home-active` (detail: { index, slug }).
 //
-// Eindeloze lus (#14, desktop en touch, niet bij reduced motion): achter de
+// Eindeloze lus (#14, alleen met muis/trackpad, niet bij reduced motion). Op
+// touch staat hij uit: op iOS Safari ging er te veel mis (momentum, snap,
+// inklappende balken). Achter de
 // lijst staat een kopie van intro + lijst (aria-hidden, inert). Staat de kopie
 // na het scrollen exact op de plek van de beginstaat, dan springen we direct
 // terug naar het origineel; het beeld is identiek, dus de sprong is onzichtbaar.
@@ -18,7 +20,8 @@ import { afterTransition, consumeReturnSlug } from './view-transition.ts';
 const SNAP_ATTR = 'data-home-snap';
 const REDUCED = '(prefers-reduced-motion: reduce)';
 const LOOP_ATTR = 'data-home-loop';
-const LOOP_QUERY = '(prefers-reduced-motion: no-preference)';
+const LOOP_QUERY =
+  '(pointer: fine) and (prefers-reduced-motion: no-preference)';
 /** Terugval voor browsers zonder `scrollend`. */
 const SCROLL_IDLE_MS = 150;
 /** Wielafstand voorbij de laatste titel (deel van de viewporthoogte) voor de lus. */
