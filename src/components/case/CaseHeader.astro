@@ -1,0 +1,52 @@
+---
+import ScreenshotBlock from '../ScreenshotBlock.astro';
+import { paragraphs } from './paragraphs';
+import { getLocale, t } from '../../i18n';
+import type { CaseEntry } from '../../lib/cases';
+
+interface Props {
+  entry: CaseEntry;
+}
+
+const { entry } = Astro.props;
+const { title, slug, agency, work, hero } = entry.data;
+const locale = getLocale(Astro.currentLocale);
+---
+
+<!--
+  Grid op de container: 1fr auto 1fr. De titel staat in kolom 2 (altijd gecentreerd
+  in de viewport, want de container is symmetrisch), de meta loopt van kolom 2 tot
+  het einde: links uitgelijnd met de titel, rechts met de container.
+-->
+<header class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+  <!-- Hook voor #11 (overgang vanaf Home) en #13. -->
+  <div
+    data-case-hero
+    data-case={slug}
+    class="col-span-full mt-12 aspect-[5/3] overflow-hidden rounded-lg md:mt-[72px] md:rounded-2xl"
+  >
+    <ScreenshotBlock
+      image={hero.image}
+      alt={hero.alt}
+      color={hero.color}
+      fit="contained"
+      inset="block"
+      class="size-full"
+    />
+  </div>
+
+  <h1 class="text-title-md md:text-title-lg col-start-2 mt-[21px] text-center md:mt-12">
+    {title}
+  </h1>
+
+  <dl class="text-body text-muted col-span-full mt-10 md:col-start-2 md:-col-end-1 grid grid-cols-[auto_1fr] gap-x-4 gap-y-[30px] md:mt-12 md:grid-cols-[167px_1fr]">
+    <dt>{t('case.agency', locale)}</dt>
+    <dd>{agency}</dd>
+    <dt>{t('case.work', locale)}</dt>
+    <dd>
+      {paragraphs(work).map((p) => (
+        <p class="[&:not(:first-child)]:mt-[1lh]">{p}</p>
+      ))}
+    </dd>
+  </dl>
+</header>

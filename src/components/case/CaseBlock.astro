@@ -1,0 +1,63 @@
+---
+import ScreenshotBlock from '../ScreenshotBlock.astro';
+import { paragraphs } from './paragraphs';
+import type { CaseBlock } from '../../lib/cases';
+
+interface Props {
+  block: CaseBlock;
+  /** Uniek anker, afgeleid van de hoofdstuknaam (voor de hoofdstuk-indicator, #10). */
+  id: string;
+}
+
+const { block, id } = Astro.props;
+const shape = 'rounded-lg md:rounded-2xl';
+---
+
+<section id={id} data-chapter={block.chapter} aria-label={block.chapter}>
+  {block.type === 'image' && (
+    <figure>
+      <ScreenshotBlock
+        image={block.image}
+        alt={block.alt}
+        color={block.color}
+        fit={block.fit}
+        inset="block"
+        class={`aspect-[5/3] ${shape}`}
+      />
+      {block.caption && (
+        <figcaption class="text-body text-muted mt-6 text-center">
+          {block.caption}
+        </figcaption>
+      )}
+    </figure>
+  )}
+  {block.type === 'double' && (
+    <figure>
+      <div class="grid aspect-[5/3] grid-cols-2 gap-2">
+        {[block.left, block.right].map((half) => (
+          <ScreenshotBlock
+            image={half.image}
+            alt={half.alt}
+            color={block.color}
+            fit={block.fit}
+            inset="block"
+            sizes="(min-width: 1080px) 509px, 50vw"
+            class={`h-full ${shape}`}
+          />
+        ))}
+      </div>
+      {block.caption && (
+        <figcaption class="text-body text-muted mt-6 text-center">
+          {block.caption}
+        </figcaption>
+      )}
+    </figure>
+  )}
+  {block.type === 'text' && (
+    <div class="text-body text-muted md:px-4">
+      {paragraphs(block.body).map((p) => (
+        <p class="[&:not(:first-child)]:mt-[1lh]">{p}</p>
+      ))}
+    </div>
+  )}
+</section>

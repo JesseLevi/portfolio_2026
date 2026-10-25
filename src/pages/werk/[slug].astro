@@ -1,0 +1,55 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CaseHeader from '../../components/case/CaseHeader.astro';
+import CaseBlock from '../../components/case/CaseBlock.astro';
+import CaseFooter from '../../components/case/CaseFooter.astro';
+import { paragraphs } from '../../components/case/paragraphs';
+import { getCases } from '../../lib/cases';
+import { getLocale, t } from '../../i18n';
+
+export const getStaticPaths = (async () => {
+  const cases = await getCases('nl');
+  return cases.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+const locale = getLocale(Astro.currentLocale);
+const { title, work, blocks } = entry.data;
+
+// Anker per blok: slug van de hoofdstuknaam, uniek gemaakt met een teller.
+const used = new Set<string>();
+const ids = blocks.map((block) => {
+  const base =
+    block.chapter
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'hoofdstuk';
+  let id = base;
+  for (let n = 2; used.has(id); n++) id = `${base}-${n}`;
+  used.add(id);
+  return id;
+});
+---
+
+<BaseLayout
+  title={`${title} | ${t('site.name', locale)}`}
+  description={paragraphs(work)[0] ?? title}
+>
+  <main>
+    <article class="mx-auto max-w-[calc(1026px+2rem)] px-4">
+      <CaseHeader entry={entry} />
+      <div class="mt-[72px] flex flex-col gap-[72px] md:mt-[104px] md:gap-[104px]">
+        {blocks.map((block, i) => (
+          <CaseBlock block={block} id={ids[i]!} />
+        ))}
+      </div>
+    </article>
+  </main>
+  <CaseFooter />
+</BaseLayout>
