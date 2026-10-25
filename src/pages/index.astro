@@ -49,6 +49,18 @@ const cases = await getCases(locale);
     padding-bottom: 0;
   }
 
+  /*
+   * Slot tijdens de sprong van de lus (home-scroll.ts): geen gebruikersscroll,
+   * scrollTo werkt wel. De vaste goot voorkomt dat klassieke scrollbalken de
+   * layout laten verspringen als ze even wegvallen.
+   */
+  html[data-home-loop] {
+    scrollbar-gutter: stable;
+  }
+  html[data-home-loop-lock] {
+    overflow: hidden;
+  }
+
   /* Snap alleen met bewegingsvoorkeur; bij reduced motion scrolt de pagina vrij. */
   @media (prefers-reduced-motion: no-preference) {
     html[data-home-snap] {
