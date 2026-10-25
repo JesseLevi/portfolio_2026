@@ -1,4 +1,198 @@
 ---
-// Contact-drawer (native <dialog>): wordt gebouwd in #6. Staat in BaseLayout.
-// Elk element met `data-open-contact` opent hem.
+// Contact-drawer (native <dialog>). Staat in BaseLayout; elk element met
+// `data-open-contact` opent hem (gedrag in src/scripts/contact-drawer.ts).
+import { Image } from 'astro:assets';
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+import illustration from '../assets/contact/illustration.png';
+import { siteConfig } from '../config';
+import { getLocale, t } from '../i18n';
+
+const locale = getLocale(Astro.currentLocale);
 ---
+
+<dialog id="contact-drawer" aria-labelledby="contact-drawer-title">
+  <div class="panel">
+    <button
+      type="button"
+      class="close"
+      data-close-contact
+      aria-label={t('contact.close', locale)}
+    >
+      <Icon name="close" size={20} />
+    </button>
+
+    <div class="content">
+      <h2 id="contact-drawer-title" class="text-heading">
+        {t('contact.title', locale)}
+      </h2>
+
+      <section class="section">
+        <div class="copy">
+          <p class="text-label text-muted font-semibold">
+            {t('contact.mail.label', locale)}
+          </p>
+          <p class="text-body">{t('contact.mail.body', locale)}</p>
+        </div>
+        <Button href={`mailto:${siteConfig.email}`} icon="mail">
+          {t('contact.mail.cta', locale)}
+        </Button>
+      </section>
+
+      <section class="section">
+        <div class="copy" style="--copy-width: 176px">
+          <p class="text-label text-muted font-semibold">
+            {t('contact.linkedin.label', locale)}
+          </p>
+          <p class="text-body">{t('contact.linkedin.body', locale)}</p>
+        </div>
+        <Button
+          href={siteConfig.linkedin}
+          icon="send"
+          target="_blank"
+          rel="noopener"
+        >
+          {t('contact.linkedin.cta', locale)}
+        </Button>
+      </section>
+    </div>
+
+    <Image
+      src={illustration}
+      alt=""
+      width={290}
+      height={232}
+      densities={[1, 2, 3]}
+      class="illustration"
+    />
+  </div>
+</dialog>
+
+<script>
+  import '../scripts/contact-drawer.ts';
+</script>
+
+<style>
+  dialog {
+    position: fixed;
+    inset: 16px 16px 16px auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: min(376px, calc(100vw - 32px));
+    max-width: none;
+    height: calc(100dvh - 32px);
+    max-height: none;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-shot);
+
+    /* Gesloten stand: schuift en fadet naar rechts. */
+    opacity: 0;
+    translate: 40px 0;
+    transition:
+      opacity 0.3s ease,
+      translate 0.3s ease,
+      overlay 0.3s allow-discrete,
+      display 0.3s allow-discrete;
+  }
+
+  dialog[open] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  @starting-style {
+    dialog[open] {
+      opacity: 0;
+      translate: 40px 0;
+    }
+  }
+
+  /* Geen dim-overlay in het ontwerp; de backdrop vangt alleen klikken buiten het paneel. */
+  dialog::backdrop {
+    background: transparent;
+  }
+
+  .panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .content {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    padding: 96px 16px 32px;
+    text-align: center;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .copy {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    /* Figma breekt de tekst na "vertel me" en "hoogte of": zelfde regelbreuk. */
+    max-width: var(--copy-width, 212px);
+  }
+
+  .close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
+    background: var(--color-pill);
+    color: var(--color-muted);
+  }
+
+  .close:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  /* Figma: 290x232, tegen de rechterrand, 45px van de onderkant. */
+  .illustration {
+    flex: none;
+    align-self: flex-end;
+    width: 290px;
+    max-width: 100%;
+    height: auto;
+    margin-top: auto;
+    margin-bottom: 45px;
+    /* De PNG is #fefefe i.p.v. wit; multiply laat de rand niet zien. */
+    mix-blend-mode: multiply;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    dialog {
+      transition: none;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Body scroll-lock zolang de drawer open is. */
+  html:has(dialog#contact-drawer[open]) {
+    overflow: hidden;
+  }
+</style>
