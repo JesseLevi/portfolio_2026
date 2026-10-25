@@ -25,6 +25,14 @@ const SCROLL_IDLE_MS = 150;
 const BRIDGE_THRESHOLD = 0.35;
 /** Pauze in de wielinvoer (ms) waarna de opgetelde afstand vervalt. */
 const BRIDGE_RESET_MS = 400;
+/** Gebruikersscroll uit tijdens de brug en de uitloop van het wielgebaar. */
+const LOCK_ATTR = 'data-home-loop-lock';
+/** Pauze in de wielinvoer (ms) na de sprong waarna het gebaar voorbij is. */
+const LOCK_IDLE_MS = 200;
+/** Wieldelta (px) na de sprong waaronder het momentum uitgeraasd is. */
+const LOCK_RELEASE_PX = 4;
+/** Langste duur van het slot (ms), ook als de wielinvoer doorloopt. */
+const LOCK_MAX_MS = 2000;
 /** Mobiele layout (paneel vast onderin), tot de `lg`-breakpoint. */
 const MOBILE_QUERY = '(max-width: 1023px)';
 
@@ -228,6 +236,43 @@ function enableLoop(): (restore: boolean) => void {
   window.addEventListener('scroll', onFadeScroll, { passive: true });
   mobileMq.addEventListener('change', fade);
 
+  // Slot tijdens de brug: het wielgebaar dat de brug start loopt door (vingers
+  // nog op het trackpad, daarna momentum). Zonder slot duwen die events de
+  // soepele scroll voorbij de kopie-intro, of scrollen ze na de sprong terug
+  // langs alle titels, tot de brug opnieuw start. preventDefault helpt niet:
+  // na het eerste event van een gebaar zijn wielevents niet meer te annuleren.
+  // overflow: hidden houdt de gebruikersscroll tegen; scrollTo werkt wel.
+  let bridging = false;
+  let locked = false;
+  let lockedAt = 0;
+  let unlockTimer: number | undefined;
+  const unlock = () => {
+    window.clearTimeout(unlockTimer);
+    locked = false;
+    root.removeAttribute(LOCK_ATTR);
+  };
+  /** Ontgrendel na een pauze in de wielinvoer (tijdens de brug: na het maximum). */
+  const armUnlock = () => {
+    window.clearTimeout(unlockTimer);
+    const left = LOCK_MAX_MS - (performance.now() - lockedAt);
+    if (left <= 0) return unlock();
+    unlockTimer = window.setTimeout(
+      unlock,
+      bridging ? left : Math.min(LOCK_IDLE_MS, left),
+    );
+  };
+  const lock = () => {
+    locked = true;
+    lockedAt = performance.now();
+    root.setAttribute(LOCK_ATTR, '');
+    armUnlock();
+  };
+  const endBridge = () => {
+    if (!bridging) return;
+    bridging = false;
+    if (locked) armUnlock();
+  };
+
   /** Spring terug zodra de kopie op de plek van het origineel staat. */
   const wrap = () => {
     const start = clone.getBoundingClientRect().top + window.scrollY;
@@ -242,10 +287,22 @@ function enableLoop(): (restore: boolean) => void {
   // voorbij de laatste titel de drempel haalt: zo snapt de laatste case niet
   // bij de eerste tik al weg. (Bij het event staat scrollY al na de tik; vandaar
   // >= i.p.v. ===.)
-  let bridging = false;
   let pull = 0;
   let lastWheel = 0;
   const onWheel = (e: WheelEvent) => {
+    const unit =
+      e.deltaMode === WheelEvent.DOM_DELTA_LINE
+        ? 16
+        : e.deltaMode === WheelEvent.DOM_DELTA_PAGE
+          ? window.innerHeight
+          : 1;
+    if (locked) {
+      // Het gebaar loopt nog: het slot blijft tot de invoer stilvalt of (na de
+      // sprong) het momentum zo klein is dat de rest terugsnapt.
+      if (!bridging && Math.abs(e.deltaY * unit) <= LOCK_RELEASE_PX) unlock();
+      else armUnlock();
+      return;
+    }
     if (bridging || e.ctrlKey) return;
     const lastTitle = getItems().at(-1)?.title;
     if (!lastTitle) return;
@@ -259,42 +316,37 @@ function enableLoop(): (restore: boolean) => void {
     }
     if (e.timeStamp - lastWheel > BRIDGE_RESET_MS) pull = 0;
     lastWheel = e.timeStamp;
-    const unit =
-      e.deltaMode === WheelEvent.DOM_DELTA_LINE
-        ? 16
-        : e.deltaMode === WheelEvent.DOM_DELTA_PAGE
-          ? window.innerHeight
-          : 1;
     pull += e.deltaY * unit;
     if (pull < window.innerHeight * BRIDGE_THRESHOLD) return;
     pull = 0;
     bridging = true;
+    lock();
     window.scrollTo({ top: start, behavior: 'smooth' });
   };
-  const endBridge = () => {
-    bridging = false;
-  };
-  window.addEventListener('scrollend', endBridge);
   window.addEventListener('wheel', onWheel, { passive: true });
 
+  // Na het scrollen: terugspringen als de kopie bereikt is. Is de brug
+  // onderbroken (geen sprong), dan vervalt hij hier ook. Zonder `scrollend`
+  // telt een pauze in de scroll-events als einde.
+  const onScrollEnd = () => {
+    wrap();
+    endBridge();
+  };
   let idle: number | undefined;
   const onScrollIdle = () => {
     window.clearTimeout(idle);
-    idle = window.setTimeout(() => {
-      bridging = false;
-      wrap();
-    }, SCROLL_IDLE_MS);
+    idle = window.setTimeout(onScrollEnd, SCROLL_IDLE_MS);
   };
   const hasScrollEnd = 'onscrollend' in window;
-  if (hasScrollEnd) window.addEventListener('scrollend', wrap);
+  if (hasScrollEnd) window.addEventListener('scrollend', onScrollEnd);
   else window.addEventListener('scroll', onScrollIdle, { passive: true });
 
   return (restore) => {
     window.removeEventListener('wheel', onWheel);
-    window.removeEventListener('scrollend', endBridge);
-    window.removeEventListener('scrollend', wrap);
+    window.removeEventListener('scrollend', onScrollEnd);
     window.removeEventListener('scroll', onScrollIdle);
     window.clearTimeout(idle);
+    unlock();
     window.removeEventListener('scroll', onFadeScroll);
     mobileMq.removeEventListener('change', fade);
     cancelAnimationFrame(fadeRaf);
