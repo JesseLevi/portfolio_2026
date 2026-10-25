@@ -2,6 +2,7 @@
 
 @theme {
   --color-ink: #000000;
+  --color-ink-hover: #333333;
   --color-paper: #ffffff;
   --color-muted: #949494;
   --color-panel: #efefef;
@@ -48,9 +49,13 @@
 }
 
 /*
- * Eigen cursor (Figma 6162:23206). Alleen een native CSS-cursor, geen JS.
- * Canvas 28x28 px op 1x (pijl 24x30 plus schaduw), hotspot (4, 2) = de punt van de pijl.
- * De PNG's staan op vaste URL's in public/cursor/; cursor.svg is de bron.
+ * Eigen cursor (Figma 6177:28512). Alleen een native CSS-cursor, geen JS.
+ * Pijl (6177:28514): canvas 28x28 px op 1x, hotspot (4, 2) = de punt van de pijl.
+ * Tekst (6177:28513): canvas 10x28 px op 1x, hotspot (5, 12) = het midden van het staafje.
+ * De @2x-PNG's hebben dubbele canvassen; de hotspot blijft in 1x-px. De PNG's staan op
+ * vaste URL's in public/cursor/; cursor.svg is de bron van de pijl.
+ * De tekstcursor staat op leesbare tekst, maar niet op of in links, knoppen (ook de
+ * niet-interactieve [data-button]), labels, summary's en de nav-pil: daar blijft de pijl (ook in de caselijst van Home).
  */
 @media (pointer: fine) {
   html,
@@ -58,7 +63,46 @@
   button,
   [role='button'],
   label,
-  summary {
+  summary,
+  [data-button] {
+    cursor:
+      url(/cursor/cursor.png) 4 2,
+      auto;
+    cursor:
+      image-set(url(/cursor/cursor.png) 1x, url(/cursor/cursor@2x.png) 2x) 4 2,
+      auto;
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  dt,
+  dd,
+  figcaption,
+  blockquote,
+  li,
+  main :where(span) {
+    cursor:
+      url(/cursor/text.png) 5 12,
+      auto;
+    cursor:
+      image-set(url(/cursor/text.png) 1x, url(/cursor/text@2x.png) 2x) 5 12,
+      auto;
+  }
+
+  /* Tekst binnen interactieve elementen en de caselijst van Home (links): de pijl. */
+  :is(
+      a,
+      button,
+      [role='button'],
+      label,
+      summary,
+      [data-nav-pill],
+      [data-button]
+    )
+    :is(p, h1, h2, h3, dt, dd, figcaption, blockquote, li, span),
+  :is([data-nav-pill], [data-case-list], [data-chapter-nav]) li {
     cursor:
       url(/cursor/cursor.png) 4 2,
       auto;

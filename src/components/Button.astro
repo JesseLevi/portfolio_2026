@@ -29,22 +29,27 @@ const classes = [
   'text-label inline-flex items-center gap-1.5 rounded-lg pt-1.5 pr-3 pb-2 pl-3 whitespace-nowrap',
   'focus-visible:outline-ink focus-visible:outline-2 focus-visible:outline-offset-2',
   variant === 'primary' ? 'bg-ink text-paper' : 'border-line text-ink border',
+  // Hover (Figma 6177:28532): primair #333, secundair pill-achtergrond. Tailwind 4 zet
+  // `hover:` achter @media (hover: hover). De decoratieve variant is niet interactief.
+  !decorative && 'transition-colors duration-150 motion-reduce:transition-none',
+  !decorative &&
+    (variant === 'primary' ? 'hover:bg-ink-hover' : 'hover:bg-pill'),
   className,
 ];
 ---
 
 {decorative ? (
-  <span class:list={classes} {...rest}>
+  <span class:list={classes} data-button {...rest}>
     <slot />
     {icon && <Icon name={icon} size={12} />}
   </span>
 ) : href ? (
-  <a href={href} class:list={classes} {...rest}>
+  <a href={href} class:list={classes} data-button {...rest}>
     <slot />
     {icon && <Icon name={icon} size={12} />}
   </a>
 ) : (
-  <button type="button" class:list={classes} {...rest}>
+  <button type="button" class:list={classes} data-button {...rest}>
     <slot />
     {icon && <Icon name={icon} size={12} />}
   </button>
