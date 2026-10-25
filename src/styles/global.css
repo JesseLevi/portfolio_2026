@@ -180,21 +180,14 @@
  * Onderkant van de pil: 24px in de mobiele layout, 40px in de desktoplayout. De layouts
  * wisselen per pagina van breakpoint: Home op `lg` (1024, paneel vast onderin tot dan),
  * de case op `md` (768, pil bij de hero). Daarom volgt de offset de pagina, niet één breakpoint.
+ * Bewust een vaste waarde, geen dvh: iOS Safari werkt dvh pas na het scrollen bij, en dan
+ * verspringt de pil na elke veeg (en legt Safari de snap opnieuw).
  */
 [data-nav-pill] {
   --nav-pill-bottom: 24px;
 }
-/*
- * Home mobiel: in Figma staat de pil 24px boven de fold. Achter de werkbalk van iOS
- * Safari is hij niet te bedienen, dus zakt hij alleen zo ver als die werkbalk
- * (100lvh - 100dvh) toelaat, met minstens 8px ruimte.
- */
-html:has([data-case-panel]) [data-nav-pill] {
-  --nav-pill-bottom: max(8px, calc(24px - (100lvh - 100dvh)));
-}
 @media (min-width: 1024px) {
-  [data-nav-pill],
-  html:has([data-case-panel]) [data-nav-pill] {
+  [data-nav-pill] {
     --nav-pill-bottom: 40px;
   }
 }

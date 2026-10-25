@@ -61,6 +61,55 @@ const cases = await getCases(locale);
     overflow: hidden;
   }
 
+  /*
+   * Mobiel: boven de kopie-intro horen geen titels. Het witte vlak boven de
+   * kopie (home-scroll.ts) vervaagt in zodra de laatste titel de snaplijn
+   * verlaat, en dekt alles af als de kopie-intro hem bereikt (één titelhoogte
+   * later). Een scrollanimatie, geen JS: die loopt in iOS Safari synchroon met
+   * het scrollen. De kopie is minstens een viewport hoog, dus `entry 100%` is
+   * het moment dat haar bovenkant de bovenrand van het scherm raakt, en
+   * `entry calc(100% - X)` het moment dat ze X onder de bovenrand staat.
+   * Zonder ondersteuning blijven de titels gewoon staan.
+   */
+  [data-home-loop-veil] {
+    display: none;
+  }
+  @supports (animation-range: entry calc(100% - 1px)) {
+    @media (max-width: 1023px) {
+      [data-home-loop-clone] {
+        position: relative;
+        view-timeline-name: --home-clone;
+        view-timeline-axis: block;
+      }
+      [data-home-loop-veil] {
+        display: block;
+        position: absolute;
+        inset-inline: -1.5rem; /* over de gutter (px-6) heen */
+        bottom: 100%;
+        height: 100lvh;
+        background-color: var(--color-paper);
+        pointer-events: none;
+        /* Longhands: de minifier vouwt `animation` + `animation-timeline` anders
+           samen tot één shorthand, en die slaan browsers over. */
+        animation-name: home-veil;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --home-clone;
+        animation-range: entry
+          calc(100% - var(--intro-h, 0px) - var(--last-h, 0px)) entry
+          calc(100% - var(--intro-h, 0px));
+      }
+    }
+  }
+  @keyframes home-veil {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
   /* Snap alleen met bewegingsvoorkeur; bij reduced motion scrolt de pagina vrij. */
   @media (prefers-reduced-motion: no-preference) {
     html[data-home-snap] {
