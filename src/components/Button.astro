@@ -1,0 +1,51 @@
+---
+import Icon from './Icon.astro';
+import type { IconName } from './Icon.astro';
+
+interface Props {
+  variant?: 'primary' | 'secondary';
+  /** Met `href` wordt het een <a>, anders een <button type="button">. */
+  href?: string;
+  /** Icoon rechts (12px). */
+  icon?: IconName;
+  /** Niet-interactief <span> (geen focus), voor knoppen zonder bestemming. */
+  decorative?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  variant = 'primary',
+  href,
+  icon,
+  decorative = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+// Padding 6/12/8/12 is met opzet asymmetrisch (Figma). De secundaire rand
+// komt er (als in Figma) bovenop, dus primair heeft geen rand.
+const classes = [
+  'text-label inline-flex items-center gap-1.5 rounded-lg pt-1.5 pr-3 pb-2 pl-3 whitespace-nowrap',
+  'focus-visible:outline-ink focus-visible:outline-2 focus-visible:outline-offset-2',
+  variant === 'primary' ? 'bg-ink text-paper' : 'border-line text-ink border',
+  className,
+];
+---
+
+{decorative ? (
+  <span class:list={classes} {...rest}>
+    <slot />
+    {icon && <Icon name={icon} size={12} />}
+  </span>
+) : href ? (
+  <a href={href} class:list={classes} {...rest}>
+    <slot />
+    {icon && <Icon name={icon} size={12} />}
+  </a>
+) : (
+  <button type="button" class:list={classes} {...rest}>
+    <slot />
+    {icon && <Icon name={icon} size={12} />}
+  </button>
+)}

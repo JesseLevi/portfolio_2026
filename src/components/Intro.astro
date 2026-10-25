@@ -1,0 +1,46 @@
+---
+import Avatar from './Avatar.astro';
+import Button from './Button.astro';
+import { getLocale, t } from '../i18n';
+
+interface Props {
+  align?: 'start' | 'center';
+  class?: string;
+}
+
+const { align = 'start', class: className } = Astro.props;
+const locale = getLocale(Astro.currentLocale);
+const centered = align === 'center';
+---
+
+<div
+  class:list={[
+    'flex flex-col gap-4',
+    centered ? 'items-center text-center' : 'items-start',
+    className,
+  ]}
+>
+  <Avatar />
+  <div
+    class:list={[
+      'flex flex-col gap-6',
+      centered ? 'items-center' : 'items-start',
+    ]}
+  >
+    <div class="text-heading flex flex-col gap-1.5">
+      <p>{t('site.name', locale)}</p>
+      <p class="text-muted">{t('site.role', locale)}</p>
+    </div>
+    <div class="flex gap-4">
+      <Button variant="primary" icon="send" data-open-contact>
+        {t('cta.contact', locale)}
+      </Button>
+      {!centered && (
+        // TODO: linkt naar de pagina "Over" zodra die er is (dan <Button href>).
+        <Button variant="secondary" icon="person" decorative>
+          {t('cta.expertise', locale)}
+        </Button>
+      )}
+    </div>
+  </div>
+</div>

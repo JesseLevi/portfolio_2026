@@ -3,37 +3,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { getLocale, t } from '../i18n';
 
 const locale = getLocale(Astro.currentLocale);
-const swatches = [
-  ['ink', 'bg-ink text-paper'],
-  ['paper', 'bg-paper text-ink border border-line'],
-  ['muted', 'bg-muted text-paper'],
-  ['panel', 'bg-panel'],
-  ['pill', 'bg-pill'],
-  ['line', 'bg-line'],
-  ['rule', 'bg-rule'],
-  ['faint', 'bg-faint'],
-  ['ring', 'bg-ring text-paper'],
-];
 ---
 
 <BaseLayout title={t('site.name', locale)} description={t('site.role', locale)}>
-  <!-- Typografie-proef: wordt in #7 vervangen. -->
-  <main class="flex flex-col gap-8 p-4">
-    <h1 class="text-title-xl">{t('site.name', locale)}</h1>
-    <p class="text-title-lg">{t('site.role', locale)}</p>
-    <p class="text-title-md">{t('cta.contact', locale)}</p>
-    <p class="text-heading">{t('site.name', locale)}</p>
-    <p class="text-body">{t('contact.mail.body', locale)}</p>
-    <p class="text-label font-semibold">{t('contact.mail.label', locale)}</p>
-    <p class="text-micro text-muted">{t('chapters.label', locale)}</p>
-    <ul class="flex flex-wrap gap-2">
-      {swatches.map(([name, cls]) => (
-        <li class={`text-label rounded-lg px-3 py-6 ${cls}`}>{name}</li>
-      ))}
-    </ul>
-    <div class="bg-panel shadow-shot h-24 w-64 rounded-lg"></div>
-    <div class="shadow-pill bg-pill w-fit rounded-full px-4 py-2">
-      {t('nav.home', locale)}
-    </div>
+  <!-- Placeholder: de echte Home komt in een later ticket. Bouwstenen: /styleguide. -->
+  <main class="p-4">
+    <h1 class="text-heading">{t('site.name', locale)}</h1>
   </main>
 </BaseLayout>
