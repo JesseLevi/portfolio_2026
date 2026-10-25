@@ -11,7 +11,12 @@ import { getLocale, t } from '../i18n';
 const locale = getLocale(Astro.currentLocale);
 ---
 
-<dialog id="contact-drawer" aria-labelledby="contact-drawer-title">
+<dialog
+  id="contact-drawer"
+  aria-labelledby="contact-drawer-title"
+  tabindex="-1"
+  autofocus
+>
   <!-- Grip en sluitknop staan buiten `.panel`, zodat ze vast blijven terwijl de inhoud scrollt. -->
   <span class="handle" aria-hidden="true"></span>
   <button
@@ -172,6 +177,10 @@ const locale = getLocale(Astro.currentLocale);
 
   .close:hover {
     background: #e5e5e5;
+  }
+
+  #contact-drawer:focus {
+    outline: none;
   }
 
   .close:focus-visible {
