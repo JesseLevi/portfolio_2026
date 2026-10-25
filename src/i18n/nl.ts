@@ -18,6 +18,7 @@ export const nl = {
   'contact.linkedin.body': 'Blijf op de hoogte of stuur een berichtje',
   'contact.linkedin.cta': 'Connect op Linkedin',
   'contact.close': 'Sluiten',
+  // case
   'case.agency': 'Agency:',
   'case.work': 'Werk:',
   'chapters.label': 'Hoofdstukken',
