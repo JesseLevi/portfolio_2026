@@ -1,0 +1,50 @@
+---
+// Hoofdstuk-indicator (Figma 6169:28392 rust, 6166:26783 hover). Gedrag: src/scripts/chapter-nav.ts.
+// Streepjes 3px dik met 12px hartafstand; het hitgebied is 12px hoog (de volle cel).
+// Server-side gerenderd uit de blokken; onzichtbaar tot het eerste hoofdstuk het midden bereikt.
+import { getLocale, t } from '../../i18n';
+
+interface Props {
+  chapters: { id: string; name: string }[];
+}
+
+const { chapters } = Astro.props;
+const locale = getLocale(Astro.currentLocale);
+---
+
+<nav
+  data-chapter-nav
+  data-visible="false"
+  aria-label={t('chapters.label', locale)}
+  class="invisible fixed top-1/2 right-6 z-40 hidden -translate-y-1/2 opacity-0 transition-[opacity,visibility] duration-300 data-[visible=true]:visible data-[visible=true]:opacity-100 lg:block"
+>
+  <ol>
+    {chapters.map(({ id, name }, i) => (
+      <li>
+        <a
+          href={`#${id}`}
+          data-chapter-link
+          data-active={String(i === 0)}
+          class="group/ch focus-visible:outline-ink flex h-3 w-10 items-center justify-end rounded-full focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          <span class="relative flex">
+            <span
+              data-chapter-label
+              class="text-micro text-muted pointer-events-none absolute top-1/2 right-full mr-2 -translate-y-1/2 whitespace-nowrap opacity-0 transition-opacity duration-200 group-hover/ch:opacity-100 group-focus-visible/ch:opacity-100"
+            >
+              {name}
+            </span>
+            <span
+              aria-hidden="true"
+              class="bg-muted group-data-[active=true]/ch:bg-ink group-hover/ch:group-data-[active=false]/ch:bg-faint h-[3px] w-7 rounded-full transition-[width,background-color] duration-300 group-data-[active=true]/ch:w-10"
+            />
+          </span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<script>
+  import '../../scripts/chapter-nav.ts';
+</script>
