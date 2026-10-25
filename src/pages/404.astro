@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import { getLocale, t } from '../i18n';
+
+const locale = getLocale(Astro.currentLocale);
+---
+
+<BaseLayout
+  title={`${t('notFound.title', locale)} | ${t('site.name', locale)}`}
+  description={t('notFound.description', locale)}
+  noindex
+>
+  <main class="flex min-h-svh flex-col items-center justify-center gap-8 px-6 pb-24 text-center">
+    <div class="flex flex-col items-center gap-4">
+      <h1 class="text-title-md md:text-title-lg">
+        {t('notFound.title', locale)}
+      </h1>
+      <p class="text-body text-muted">{t('notFound.body', locale)}</p>
+    </div>
+    <Button variant="primary" href="/">
+      {t('notFound.cta', locale)}
+    </Button>
+  </main>
+</BaseLayout>

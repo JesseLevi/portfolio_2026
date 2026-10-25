@@ -1,5 +1,6 @@
 ---
 import type { GetStaticPaths } from 'astro';
+import { getImage } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CaseHeader from '../../components/case/CaseHeader.astro';
 import CaseBlock from '../../components/case/CaseBlock.astro';
@@ -19,7 +20,9 @@ export const getStaticPaths = (async () => {
 
 const { entry } = Astro.props;
 const locale = getLocale(Astro.currentLocale);
-const { title, work, blocks } = entry.data;
+const { title, work, blocks, hero } = entry.data;
+// De hero is een png met schaduw (alpha): jpg zou zwart worden, dus png.
+const og = await getImage({ src: hero.image, width: 1200, format: 'png' });
 
 // Anker per blok: slug van de hoofdstuknaam, uniek gemaakt met een teller.
 const used = new Set<string>();
@@ -41,6 +44,9 @@ const ids = blocks.map((block) => {
 <BaseLayout
   title={`${title} | ${t('site.name', locale)}`}
   description={paragraphs(work)[0] ?? title}
+  image={og.src}
+  imageWidth={og.attributes.width}
+  imageHeight={og.attributes.height}
 >
   <main>
     <article class="mx-auto max-w-[calc(1026px+2rem)] px-4">
