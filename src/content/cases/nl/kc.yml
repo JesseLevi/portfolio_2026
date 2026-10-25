@@ -1,0 +1,36 @@
+title: KC
+slug: kc
+order: 5
+agency: Build in Amsterdam
+work: |-
+  Placeholdertekst over het werk voor KC. Hier komt een korte beschrijving van de opdracht en mijn rol.
+
+  Een tweede alinea, gescheiden door een lege regel, met meer context over het project.
+hero:
+  image: ../../../assets/cases/kc-hero.png
+  alt: Placeholder-beschrijving van de hero van KC
+  color: '#efefef'
+blocks:
+  - type: image
+    chapter: Iconen
+    image: ../../../assets/cases/kc-image.png
+    alt: Placeholder-beschrijving van het beeld voor KC
+    fit: contained
+    color: '#efefef'
+    caption: Bijschrift bij het beeld
+  - type: double
+    chapter: Product
+    left:
+      image: ../../../assets/cases/kc-left.png
+      alt: Placeholder-beschrijving van de linkerafbeelding
+    right:
+      image: ../../../assets/cases/kc-right.png
+      alt: Placeholder-beschrijving van de rechterafbeelding
+    fit: full-bleed
+    color: '#efefef'
+  - type: text
+    chapter: Aanpak
+    body: |-
+      Placeholdertekst over de aanpak van KC.
+
+      Een tweede alinea over de keuzes en het resultaat.

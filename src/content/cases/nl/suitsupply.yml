@@ -1,0 +1,36 @@
+title: Suitsupply
+slug: suitsupply
+order: 1
+agency: Build in Amsterdam
+work: |-
+  Placeholdertekst over het werk voor Suitsupply. Hier komt een korte beschrijving van de opdracht en mijn rol.
+
+  Een tweede alinea, gescheiden door een lege regel, met meer context over het project.
+hero:
+  image: ../../../assets/cases/suitsupply-hero.png
+  alt: Placeholder-beschrijving van de hero van Suitsupply
+  color: '#efefef'
+blocks:
+  - type: image
+    chapter: Iconen
+    image: ../../../assets/cases/suitsupply-image.png
+    alt: Placeholder-beschrijving van het beeld voor Suitsupply
+    fit: contained
+    color: '#efefef'
+    caption: Bijschrift bij het beeld
+  - type: double
+    chapter: Product
+    left:
+      image: ../../../assets/cases/suitsupply-left.png
+      alt: Placeholder-beschrijving van de linkerafbeelding
+    right:
+      image: ../../../assets/cases/suitsupply-right.png
+      alt: Placeholder-beschrijving van de rechterafbeelding
+    fit: full-bleed
+    color: '#d8d2c8'
+  - type: text
+    chapter: Aanpak
+    body: |-
+      Placeholdertekst over de aanpak van Suitsupply.
+
+      Een tweede alinea over de keuzes en het resultaat.

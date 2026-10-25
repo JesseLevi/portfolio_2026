@@ -1,0 +1,36 @@
+title: Belsimpel
+slug: belsimpel
+order: 3
+agency: Build in Amsterdam
+work: |-
+  Placeholdertekst over het werk voor Belsimpel. Hier komt een korte beschrijving van de opdracht en mijn rol.
+
+  Een tweede alinea, gescheiden door een lege regel, met meer context over het project.
+hero:
+  image: ../../../assets/cases/belsimpel-hero.png
+  alt: Placeholder-beschrijving van de hero van Belsimpel
+  color: '#efefef'
+blocks:
+  - type: image
+    chapter: Iconen
+    image: ../../../assets/cases/belsimpel-image.png
+    alt: Placeholder-beschrijving van het beeld voor Belsimpel
+    fit: contained
+    color: '#efefef'
+    caption: Bijschrift bij het beeld
+  - type: double
+    chapter: Product
+    left:
+      image: ../../../assets/cases/belsimpel-left.png
+      alt: Placeholder-beschrijving van de linkerafbeelding
+    right:
+      image: ../../../assets/cases/belsimpel-right.png
+      alt: Placeholder-beschrijving van de rechterafbeelding
+    fit: full-bleed
+    color: '#ffe3cf'
+  - type: text
+    chapter: Aanpak
+    body: |-
+      Placeholdertekst over de aanpak van Belsimpel.
+
+      Een tweede alinea over de keuzes en het resultaat.
