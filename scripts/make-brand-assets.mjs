@@ -17,49 +17,52 @@ const avatarPath = 'src/assets/avatar.png';
 mkdirSync('public', { recursive: true });
 
 // --- OG-afbeelding 1200x630 ---
-// De intro van Home (Intro.astro + Avatar.astro), S keer zo groot en gecentreerd:
+// De intro van Home (Intro.astro + Avatar.astro) op schaal, maar met de avatar naast de tekst:
 // avatar 62 met ring en inner shadows, 16 gap, naam en rol allebei 22px Medium, 6 gap ertussen.
+// S volgt uit de breedte: het blok vult de OG tot MARGIN van de randen.
 const W = 1200;
 const H = 630;
-const S = 2.6;
-const AV = 62 * S;
-const TEXT = 22 * S;
+const MARGIN = 120;
 const { default: opentype } = await import('opentype.js');
 // opentype.loadSync geeft in v2 niets terug: parse de buffer zelf.
 const font = opentype.parse(new Uint8Array(readFileSync(INTER_MEDIUM)).buffer);
-const em = TEXT / font.unitsPerEm;
-// line-height: normal = ascender + descender uit hhea.
-const lineH = (font.ascender - font.descender) * em;
-// Glyph voor glyph met kerning: de shaping van opentype.js struikelt over de ccmp-lookups van Inter.
+// Glyph voor glyph met kerning (op 1px): de shaping van opentype.js struikelt over de ccmp-lookups van Inter.
 const layout = (content) => {
   let x = 0;
   let prev = null;
   const glyphs = [];
   for (const char of content) {
     const glyph = font.charToGlyph(char);
-    if (prev) x += font.getKerningValue(prev, glyph) * em;
+    if (prev) x += font.getKerningValue(prev, glyph) / font.unitsPerEm;
     glyphs.push([glyph, x]);
-    x += glyph.advanceWidth * em;
+    x += glyph.advanceWidth / font.unitsPerEm;
     prev = glyph;
   }
   return { glyphs, width: x };
 };
 const name = layout('Jesse Kamps');
 const role = layout('Designer voor web en identiteit');
-const blockW = Math.max(AV, name.width, role.width);
-const blockH = AV + 16 * S + lineH + 6 * S + lineH;
-const left = (W - blockW) / 2;
-const top = (H - blockH) / 2;
-const textTop = top + AV + 16 * S;
+const S = (W - 2 * MARGIN) / (62 + 16 + 22 * Math.max(name.width, role.width));
+const AV = 62 * S;
+const TEXT = 22 * S;
+const em = TEXT / font.unitsPerEm;
+// line-height: normal = ascender + descender uit hhea.
+const lineH = (font.ascender - font.descender) * em;
+const textH = lineH + 6 * S + lineH;
+const top = (H - AV) / 2;
+const textTop = (H - textH) / 2;
+const textLeft = MARGIN + AV + 16 * S;
 const text = (line, color, y) =>
   `<path fill="${color}" d="${line.glyphs
     .map(([glyph, x]) =>
-      glyph.getPath(left + x, y + font.ascender * em, TEXT).toPathData(2),
+      glyph
+        .getPath(textLeft + x * TEXT, y + font.ascender * em, TEXT)
+        .toPathData(2),
     )
     .join('')}"/>`;
 
 const r = AV / 2;
-const cx = left + r;
+const cx = MARGIN + r;
 const cy = top + r;
 // Inset box-shadow: een vlak met een cirkelgat (straal r - spread), verschoven en vervaagd, binnen de cirkel.
 const inset = (id, y, blur, spread) =>
@@ -76,7 +79,7 @@ const avatar = (
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
   <rect width="${W}" height="${H}" fill="#ffffff"/>
   <defs><clipPath id="av"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath></defs>
-  <image href="data:image/png;base64,${avatar}" x="${left}" y="${top}" width="${AV}" height="${AV}" clip-path="url(#av)"/>
+  <image href="data:image/png;base64,${avatar}" x="${MARGIN}" y="${top}" width="${AV}" height="${AV}" clip-path="url(#av)"/>
   ${inset('s1', 2, 10, -4)}
   ${inset('s2', 3, 4, -5)}
   <circle cx="${cx}" cy="${cy}" r="${r - S / 2}" fill="none" stroke="#f2f2f2" stroke-width="${S}"/>
@@ -87,7 +90,7 @@ await sharp(Buffer.from(svg))
   .flatten({ background: '#ffffff' })
   .png()
   .toFile('public/og.png');
-console.log(`OG: blok ${Math.round(blockW)}x${Math.round(blockH)}`);
+console.log(`OG: schaal ${S.toFixed(2)}`);
 
 // --- Favicon ---
 const b64 = (await sharp(avatarPath).resize(96, 96).png().toBuffer()).toString(
