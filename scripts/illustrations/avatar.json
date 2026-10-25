@@ -2,6 +2,7 @@
   "src": "src/assets/avatar.png",
   "out": "src/assets/avatar.svg",
   "css": "avatar.css",
+  "static": true,
   "layers": [
     {
       "name": "head",

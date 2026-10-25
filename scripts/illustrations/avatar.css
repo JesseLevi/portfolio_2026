@@ -1,6 +1,6 @@
 /*
- * Avatar: het hoofd kijkt af en toe rond. Lang stil, dan naar links, terug, naar rechtsboven,
- * terug. De gelaatstrekken schuiven verder dan de omtrek (parallax), zodat het hoofd lijkt te
+ * Avatar: het hoofd kijkt rond. Meteen na het laden kijkt hij naar jou (zo zie je direct dat
+ * hij leeft), dan terug, later naar rechtsboven, terug. De gelaatstrekken schuiven verder dan de omtrek (parallax), zodat het hoofd lijkt te
  * draaien in plaats van te kantelen. Hij knippert vlak voor elke blikwisseling.
  * Draaipunt: midden van de nek, op de hoogte van de snede.
  */
@@ -28,56 +28,59 @@
 
 @keyframes head {
   0%,
-  20%,
-  48%,
-  59%,
-  84%,
+  6%,
+  36%,
+  58%,
+  81%,
   100% {
     transform: none;
   }
-  27%,
-  41% {
+  12%,
+  30% {
     transform: rotate(-3deg);
   }
-  66%,
-  77% {
+  64%,
+  75% {
     transform: rotate(2.5deg);
   }
 }
 
 @keyframes face {
   0%,
-  20%,
-  48%,
-  59%,
-  84%,
+  6%,
+  36%,
+  58%,
+  81%,
   100% {
     transform: none;
   }
-  27%,
-  41% {
+  12%,
+  30% {
     transform: translate(-5px, 1px);
   }
-  66%,
-  77% {
+  64%,
+  75% {
     transform: translate(3px, -2px);
   }
 }
 
 @keyframes blink {
   0%,
-  19.4%,
-  20.8%,
-  58.4%,
-  59.8%,
-  92.4%,
-  93.8%,
+  4.7%,
+  6.1%,
+  22.3%,
+  23.7%,
+  56.8%,
+  58.2%,
+  91.7%,
+  93.1%,
   100% {
     transform: none;
   }
-  20.1%,
-  59.1%,
-  93.1% {
+  5.4%,
+  23%,
+  57.5%,
+  92.4% {
     transform: scaleY(0.1);
   }
 }

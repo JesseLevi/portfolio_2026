@@ -1,109 +1,113 @@
 /*
- * Contact-drawer. Elk onderdeel heeft een eigen periode, zodat het geheel nooit in de maat loopt.
+ * Contact-drawer. De SVG staat inline in de drawer: een gesloten <dialog> is display: none,
+ * dus bij elke keer openen begint de animatie opnieuw. Daarom staat het moment dat hij naar
+ * jou kijkt vooraan. Elk onderdeel heeft een eigen periode, zodat het geheel nooit in de maat
+ * loopt. Selectors en keyframes hebben een prefix, want inline gelden ze voor de hele pagina.
  */
 
-/* Hoofd: kijkt naar de mok op tafel (en de lege kruk), terug, dan naar jou, terug. */
-.head,
-.face {
+/* Hoofd: kijkt naar jou, terug, dan naar de mok op tafel (en de lege kruk), terug. */
+.contact-illustration .head,
+.contact-illustration .face {
   transform-box: view-box;
   transform-origin: 262px 194px;
   animation: 16s cubic-bezier(0.45, 0, 0.3, 1) infinite;
 }
 
-.head {
-  animation-name: head;
+.contact-illustration .head {
+  animation-name: contact-head;
 }
 
-.face {
-  animation-name: face;
+.contact-illustration .face {
+  animation-name: contact-face;
 }
 
-.eyeL,
-.eyeR {
+.contact-illustration .eyeL,
+.contact-illustration .eyeR {
   transform-box: fill-box;
   transform-origin: center;
-  animation: blink 16s infinite;
+  animation: contact-blink 16s infinite;
 }
 
-@keyframes head {
+@keyframes contact-head {
   0%,
-  16%,
-  41%,
-  52%,
-  82%,
+  4%,
+  34%,
+  50%,
+  76%,
   100% {
     transform: none;
   }
-  22%,
-  36% {
-    transform: rotate(2deg);
-  }
-  58%,
-  76% {
+  10%,
+  28% {
     transform: rotate(-2.5deg);
   }
+  56%,
+  70% {
+    transform: rotate(2deg);
+  }
 }
 
-@keyframes face {
+@keyframes contact-face {
   0%,
-  16%,
-  41%,
-  52%,
-  82%,
+  4%,
+  34%,
+  50%,
+  76%,
   100% {
     transform: none;
   }
-  22%,
-  36% {
-    transform: translate(4px, 2px);
-  }
-  58%,
-  76% {
+  10%,
+  28% {
     transform: translate(-6px, -1px);
   }
+  56%,
+  70% {
+    transform: translate(4px, 2px);
+  }
 }
 
-@keyframes blink {
+/* Knipperen vlak voor elke blikwisseling, en een keer tussendoor. */
+@keyframes contact-blink {
   0%,
-  15.2%,
-  16.4%,
-  51.2%,
-  52.4%,
-  66%,
-  67.2%,
-  90%,
-  91.2%,
+  3%,
+  4.2%,
+  19.4%,
+  20.6%,
+  49%,
+  50.2%,
+  87.4%,
+  88.6%,
   100% {
     transform: none;
   }
-  15.8%,
-  51.8%,
-  66.6%,
-  90.6% {
+  3.6%,
+  20%,
+  49.6%,
+  88% {
     transform: scaleY(0.1);
   }
 }
 
 /* Koffiedamp: stijgt op, golft en vervaagt. */
-.steamA,
-.steamB,
-.steamC {
+.contact-illustration .steamA,
+.contact-illustration .steamB,
+.contact-illustration .steamC {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: steam 3.6s ease-in-out infinite;
+  animation: contact-steam 3.6s ease-in-out infinite;
 }
 
-.steamB {
+.contact-illustration .steamB {
   animation-duration: 4.1s;
   animation-delay: -1.6s;
 }
 
-.steamC {
+.contact-illustration .steamC {
   animation-duration: 4.6s;
   animation-delay: -2.9s;
 }
 
-@keyframes steam {
+@keyframes contact-steam {
   0% {
     opacity: 0;
     transform: translateY(6px) scaleY(0.8);
@@ -122,20 +126,21 @@
   }
 }
 
-/* Het gekruiste been zwaait rustig vanuit de knie; de voet wipt af en toe vanuit de enkel. */
-.shin {
+/* Het gekruiste been zwaait rustig vanuit de knie; de voet schommelt vanuit de enkel, met
+   wisselende uitslag. */
+.contact-illustration .shin {
   transform-box: view-box;
   transform-origin: 250px 372px;
-  animation: swing 4.4s ease-in-out infinite alternate;
+  animation: contact-swing 4.4s ease-in-out infinite alternate;
 }
 
-.shoe {
+.contact-illustration .shoe {
   transform-box: view-box;
   transform-origin: 306px 508px;
-  animation: bob 6.2s ease-in-out infinite;
+  animation: contact-rock 5.2s ease-in-out infinite;
 }
 
-@keyframes swing {
+@keyframes contact-swing {
   from {
     transform: rotate(0.6deg);
   }
@@ -144,27 +149,30 @@
   }
 }
 
-@keyframes bob {
+@keyframes contact-rock {
   0%,
-  46%,
-  84%,
   100% {
     transform: none;
   }
-  54%,
-  59% {
-    transform: rotate(-3deg);
+  14% {
+    transform: rotate(-4.5deg);
   }
-  67% {
-    transform: rotate(-0.5deg);
+  30% {
+    transform: rotate(0.8deg);
   }
-  74% {
-    transform: rotate(-2.2deg);
+  46% {
+    transform: rotate(-3.8deg);
+  }
+  62% {
+    transform: rotate(0.5deg);
+  }
+  80% {
+    transform: rotate(-2.6deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
+  .contact-illustration * {
     animation: none !important;
   }
 }

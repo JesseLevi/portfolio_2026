@@ -1,6 +1,7 @@
 {
   "src": "src/assets/contact/illustration.png",
   "out": "src/assets/contact/illustration.svg",
+  "class": "contact-illustration",
   "css": "contact.css",
   "extras": "contact.extras.svg",
   "layers": [
