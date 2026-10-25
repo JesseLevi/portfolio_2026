@@ -40,12 +40,12 @@ const items: {
     <span
       data-nav-circle
       aria-hidden="true"
-      style="transform: translateX(8px)"
-      class="bg-pill pointer-events-none absolute top-2 left-0 h-8 w-[78px] rounded-full transition-[transform,width] duration-300 ease-(--nav-ease) will-change-transform"
+      style={`transform: translateX(8px); opacity: ${onHome ? 1 : 0}`}
+      class="bg-pill pointer-events-none absolute top-2 left-0 h-8 w-[78px] rounded-full transition-[transform,width,opacity] duration-300 ease-(--nav-ease) will-change-transform"
     ></span>
     <ul class="flex items-center gap-2">
       {items.map(({ id, icon, label, tag: Tag }) => {
-        const active = id === 'home';
+        const active = id === 'home' && onHome;
         return (
           <li class="relative z-10">
             <Tag

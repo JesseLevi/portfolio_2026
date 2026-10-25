@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { getImage } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import BackButton from '../../components/case/BackButton.astro';
 import CaseHeader from '../../components/case/CaseHeader.astro';
 import CaseBlock from '../../components/case/CaseBlock.astro';
 import ChapterNav from '../../components/case/ChapterNav.astro';
@@ -49,6 +50,7 @@ const ids = blocks.map((block) => {
   imageHeight={og.attributes.height}
 >
   <main>
+    <BackButton />
     <article class="mx-auto max-w-[calc(1026px+2rem)] px-4">
       <CaseHeader entry={entry} />
       <div class="mt-[72px] flex flex-col gap-[72px] md:mt-[104px] md:gap-[104px]">

@@ -21,6 +21,7 @@ export const nl = {
   // case
   'case.agency': 'Agency:',
   'case.work': 'Werk:',
+  'case.back': 'Terug naar Home',
   'chapters.label': 'Hoofdstukken',
   // 404
   'notFound.title': 'Pagina niet gevonden',

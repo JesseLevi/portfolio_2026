@@ -14,7 +14,10 @@ let drawerOpen = false;
 let hovered: Id | null = null;
 let render: (() => void) | null = null;
 
-const activeId = (): Id => (drawerOpen ? 'contact' : 'home');
+// Home is alleen actief op `/`; op een case staat geen item aan, zodat Home een
+// gewone link terug is (Figma 6166:24666).
+const activeId = (): Id | null =>
+  drawerOpen ? 'contact' : location.pathname === '/' ? 'home' : null;
 
 function setup(nav: HTMLElement) {
   const circle = nav.querySelector<HTMLElement>('[data-nav-circle]')!;
@@ -32,17 +35,27 @@ function setup(nav: HTMLElement) {
     );
   };
 
-  const widthOf = (id: Id, active: Id) =>
+  const widthOf = (id: Id, active: Id | null) =>
     id === active ? PAD_ACTIVE * 2 + ICON + labelWidth[id] : SIZE_INACTIVE;
 
-  const place = (target: Id, active: Id) => {
+  const place = (target: Id | null, active: Id | null) => {
+    // Geen doel: de cirkel vervaagt op zijn plek.
+    // Uit het niets: eerst zonder animatie op het doel zetten, dan alleen invagen.
+    const hidden = circle.style.opacity === '0';
+    circle.style.opacity = target ? '1' : '0';
+    if (!target) return;
     let x = PAD;
     for (const id of ids) {
       if (id === target) break;
       x += widthOf(id, active) + GAP;
     }
+    if (hidden) circle.style.transitionProperty = 'opacity';
     circle.style.width = `${widthOf(target, active)}px`;
     circle.style.transform = `translateX(${x}px)`;
+    if (hidden) {
+      void circle.offsetWidth;
+      circle.style.transitionProperty = '';
+    }
   };
 
   const apply = () => {
@@ -52,9 +65,7 @@ function setup(nav: HTMLElement) {
       const on = id === active;
       el.dataset.active = String(on);
       if (id === 'home') {
-        // Alleen op de route `/`: op een case is Home wel gemarkeerd, maar niet de huidige pagina.
-        if (on && location.pathname === '/')
-          el.setAttribute('aria-current', 'page');
+        if (on) el.setAttribute('aria-current', 'page');
         else el.removeAttribute('aria-current');
       } else if (id === 'contact') {
         // Geen `page`: Contact is een knop, geen pagina.
