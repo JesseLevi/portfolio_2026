@@ -84,3 +84,84 @@
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Overgang Home -> case (#13). Gedeelde elementen: het blok en de screenshot.
+ * Op de case-pagina staat de naam op de hero; op Home zet home-scroll.ts hem
+ * op het actieve paneel-item (één naam per pagina). Buiten beeld: geen morph.
+ * Reduced motion: <ClientRouter /> zet alle view-transition-animaties uit
+ * (wissel zonder animatie); de eigen animaties staan daarom onder no-preference.
+ */
+[data-case-hero] {
+  view-transition-name: case-block;
+}
+[data-case-hero] [data-shot] {
+  view-transition-name: case-shot;
+}
+[data-case-hero][data-vt-off],
+[data-case-hero][data-vt-off] [data-shot] {
+  view-transition-name: none;
+}
+
+:root {
+  --vt-radius: 8px;
+  --vt-duration: 500ms;
+  --vt-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (min-width: 768px) {
+  :root {
+    --vt-radius: 16px;
+  }
+}
+
+/*
+ * De nav-pil heeft een eigen groep zodat hij niet meecrossfadet: de oude versie
+ * is verborgen en de nieuwe verschijnt zonder fade. De groep schuift hem rustig
+ * naar de nieuwe plek (de pil staat op de case onder de hero, op Home vast
+ * onderin), in plaats van te springen.
+ */
+::view-transition-old(nav-pill) {
+  display: none;
+}
+::view-transition-new(nav-pill) {
+  animation: none;
+}
+
+/* Het blok is een egale kleur: rek het mee met de groep (geen letterboxing). */
+::view-transition-old(case-block),
+::view-transition-new(case-block) {
+  height: 100%;
+  object-fit: fill;
+}
+::view-transition-image-pair(case-block) {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Rustige fade van de rest (o.a. de linkerkolom van Home): 400ms, ease-out. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 400ms;
+    animation-timing-function: ease-out;
+  }
+  ::view-transition-group(case-block),
+  ::view-transition-group(case-shot),
+  ::view-transition-group(nav-pill) {
+    animation-duration: var(--vt-duration);
+    animation-timing-function: var(--vt-ease);
+  }
+  html[data-vt='to-case']::view-transition-image-pair(case-block) {
+    animation: vt-radius var(--vt-duration) var(--vt-ease) both;
+  }
+  html[data-vt='to-home']::view-transition-image-pair(case-block) {
+    animation: vt-radius var(--vt-duration) var(--vt-ease) both reverse;
+  }
+}
+@keyframes vt-radius {
+  from {
+    border-radius: 0;
+  }
+  to {
+    border-radius: var(--vt-radius);
+  }
+}

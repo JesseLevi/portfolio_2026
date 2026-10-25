@@ -26,6 +26,9 @@ const locale = getLocale(Astro.currentLocale);
     <Font cssVariable="--font-inter" preload={[{ subset: 'latin' }]} />
     <ClientRouter />
     <slot name="head" />
+    <script>
+      import '../scripts/view-transition.ts';
+    </script>
   </head>
   <body>
     <slot />
