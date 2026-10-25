@@ -163,6 +163,13 @@ const locale = getLocale(Astro.currentLocale);
     border-radius: 9999px;
     background: var(--color-pill);
     color: var(--color-muted);
+    transition:
+      background-color 300ms,
+      color 300ms;
+  }
+
+  .close:hover {
+    background: #e5e5e5;
   }
 
   .close:focus-visible {
