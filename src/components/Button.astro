@@ -31,7 +31,9 @@ const classes = [
   variant === 'primary' ? 'bg-ink text-paper' : 'border-line text-ink border',
   // Hover (Figma 6177:28532): primair #333, secundair pill-achtergrond. Tailwind 4 zet
   // `hover:` achter @media (hover: hover). De decoratieve variant is niet interactief.
-  !decorative && 'transition-colors duration-150 motion-reduce:transition-none',
+  // Indrukken: kort kleiner, bij loslaten terug naar normaal.
+  !decorative &&
+    'transition-[color,background-color,scale] duration-150 active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100',
   !decorative &&
     (variant === 'primary' ? 'hover:bg-ink-hover' : 'hover:bg-pill'),
   className,

@@ -57,7 +57,7 @@ const items: {
               {...(Tag === 'button'
                 ? { type: 'button', 'data-open-contact': '' }
                 : {})}
-              class="group/item text-label focus-visible:outline-ink text-muted data-[active=true]:text-ink flex h-8 items-center justify-center rounded-full px-2 transition-[padding] duration-300 ease-(--nav-ease) focus-visible:outline-2 focus-visible:outline-offset-2 data-[active=true]:px-3"
+              class="group/item text-label focus-visible:outline-ink text-muted data-[active=true]:text-ink flex h-8 items-center justify-center rounded-full px-2 transition-[padding,scale] duration-300 ease-(--nav-ease) active:scale-95 motion-reduce:active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 data-[active=true]:px-3"
             >
               <Icon name={icon} />
               <span class="grid grid-cols-[0fr] opacity-0 transition-[grid-template-columns,opacity] duration-300 ease-(--nav-ease) group-data-[active=true]/item:grid-cols-[1fr] group-data-[active=true]/item:opacity-100">

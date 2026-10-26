@@ -167,11 +167,16 @@ const locale = getLocale(Astro.currentLocale);
     color: var(--color-muted);
     transition:
       background-color 300ms,
-      color 300ms;
+      color 300ms,
+      scale 150ms;
   }
 
   .close:hover {
     background: #e5e5e5;
+  }
+
+  .close:active {
+    scale: 0.95;
   }
 
   #contact-drawer:focus {
