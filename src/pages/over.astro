@@ -4,23 +4,25 @@ import Avatar from '../components/Avatar.astro';
 import Button from '../components/Button.astro';
 import ChapterNav from '../components/case/ChapterNav.astro';
 import ServiceCard from '../components/about/ServiceCard.astro';
-import illustration from '../assets/about/illustration.svg';
+import WorkCard from '../components/about/WorkCard.astro';
 import contact from '../assets/contact/illustration.svg';
 import contactStatic from '../assets/contact/illustration-static.svg';
 import { getAbout } from '../lib/about';
+import { getCases } from '../lib/cases';
 import { siteConfig } from '../config';
 import { getLocale, t } from '../i18n';
 
 const locale = getLocale(Astro.currentLocale);
-const { status, title, subtitle, clients, services, process, about, closing } =
+const { status, title, subtitle, clients, services, process, work, closing } =
   await getAbout(locale);
+const cases = new Map((await getCases(locale)).map((c) => [c.data.slug, c]));
 
 // Hoofdstukken: dezelfde indicator als op de case-pagina (vanaf `lg`).
 const ids = {
   intro: 'intro',
   services: 'diensten',
   process: 'werkwijze',
-  about: 'over-mij',
+  work: 'werk',
   contact: 'contact',
 } as const;
 const chapters = (Object.keys(ids) as (keyof typeof ids)[]).map((key) => ({
@@ -47,9 +49,13 @@ const jsonLd = {
   },
 };
 
+// Entree: alles t/m de fold komt bij het laden één voor één binnen (zie <style>).
+const enter = (i: number) => `--i: ${i}`;
+
 // Sectiekoppen: 28px mobiel, 48px vanaf `md`.
 const h2 = 'text-title-xs md:text-title-md leading-[1.1]';
 const section = 'mt-28 scroll-mt-12 md:mt-40';
+const container = 'mx-auto max-w-[calc(1026px+2rem)] px-4';
 ---
 
 <BaseLayout
@@ -62,14 +68,17 @@ const section = 'mt-28 scroll-mt-12 md:mt-40';
     set:html={JSON.stringify(jsonLd)}
   />
   <main class="pb-40">
-    <article class="mx-auto max-w-[calc(1026px+2rem)] px-4">
+    <div class={container}>
       <!-- Intro: status, belofte, knoppen en de klanten als bewijs. -->
       <section
         id={ids.intro}
         aria-labelledby="over-titel"
         class="flex flex-col items-center pt-16 text-center md:pt-28"
       >
-        <div class="bg-paper shadow-pill text-label flex h-9 items-center gap-2 rounded-full pr-4 pl-1.5">
+        <div
+          style={enter(0)}
+          class="enter bg-paper shadow-pill text-label flex h-9 items-center gap-2 rounded-full pr-4 pl-1.5"
+        >
           <Avatar size={24} />
           <span class="relative flex size-2" aria-hidden="true">
             <span class="bg-available absolute inset-0 animate-ping rounded-full opacity-60"></span>
@@ -82,10 +91,18 @@ const section = 'mt-28 scroll-mt-12 md:mt-40';
           id="over-titel"
           class="text-title-sm md:text-title-lg mt-8 max-w-[880px] leading-[1.1] text-balance"
         >
-          {title} <span class="text-muted">{subtitle}</span>
+          <span class="enter" style={enter(1)}>
+            {title}
+          </span>{' '}
+          <span style={enter(2)} class="enter text-muted">
+            {subtitle}
+          </span>
         </h1>
 
-        <div class="mt-10 flex flex-wrap justify-center gap-4">
+        <div
+          style={enter(3)}
+          class="enter mt-10 flex flex-wrap justify-center gap-4"
+        >
           <Button variant="primary" icon="send" data-open-contact>
             {t('cta.contact', locale)}
           </Button>
@@ -95,10 +112,12 @@ const section = 'mt-28 scroll-mt-12 md:mt-40';
         </div>
 
         <div class="mt-20 md:mt-24">
-          <p class="text-body text-muted">{clients.label}</p>
+          <p style={enter(4)} class="enter text-body text-muted">
+            {clients.label}
+          </p>
           <ul class="text-heading mt-4 flex flex-wrap justify-center gap-x-8 gap-y-2">
-            {clients.items.map(({ name, case: slug }) => (
-              <li>
+            {clients.items.map(({ name, case: slug }, i) => (
+              <li class="enter" style={enter(5 + i)}>
                 {slug ? (
                   <a
                     href={`/werk/${slug}`}
@@ -121,7 +140,11 @@ const section = 'mt-28 scroll-mt-12 md:mt-40';
         aria-labelledby="diensten-titel"
         class={section}
       >
-        <h2 id="diensten-titel" class:list={[h2, 'text-center']}>
+        <h2
+          id="diensten-titel"
+          style={enter(5 + clients.items.length)}
+          class:list={[h2, 'enter text-center']}
+        >
           {services.title}
         </h2>
         <ul class="mt-10 grid gap-y-16 md:mt-14 lg:grid-cols-3 lg:gap-x-2 lg:gap-y-0">
@@ -154,40 +177,26 @@ const section = 'mt-28 scroll-mt-12 md:mt-40';
           ))}
         </ol>
       </section>
+    </div>
 
-      <!-- Over mij: het dubbele blok van de case, met de illustratie links en tekst rechts. -->
-      <section
-        id={ids.about}
-        aria-labelledby="over-mij-titel"
-        class:list={[section, 'grid gap-y-10 md:grid-cols-2 md:gap-x-2']}
-      >
-        <div class="bg-panel flex aspect-4/5 items-center justify-center rounded-lg md:rounded-2xl">
-          <img
-            src={illustration.src}
-            width={illustration.width}
-            height={illustration.height}
-            alt={t('about.illustration', locale)}
-            loading="lazy"
-            decoding="async"
-            class="h-auto w-[80%]"
-          />
-        </div>
-        <div class="flex flex-col justify-center px-1 md:px-12">
-          <h2 id="over-mij-titel" class={h2}>
-            {about.title}
-          </h2>
-          <p class="text-body text-muted mt-4 max-w-[36ch]">{about.body}</p>
-          <dl class="text-body mt-10 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3">
-            {about.facts.map(({ label, value }) => (
-              <>
-                <dt class="text-muted">{label}</dt>
-                <dd>{value}</dd>
-              </>
-            ))}
-          </dl>
-        </div>
-      </section>
+    <!-- Werk: kaarten naar de cases, breder dan de container (max 1312, zodat de hoofdstuk-indicator op 1440 vrij blijft). Passen ze niet, dan veeg je. -->
+    <section id={ids.work} aria-labelledby="werk-titel" class={section}>
+      <h2 id="werk-titel" class:list={[h2, 'px-4 text-center']}>
+        {work.title}
+      </h2>
+      <ul class="mx-auto mt-10 flex max-w-[1312px] snap-x snap-mandatory scroll-px-4 gap-2 overflow-x-auto px-4 [justify-content:safe_center] [scrollbar-width:none] md:mt-14">
+        {work.items.map((item) => (
+          <WorkCard entry={cases.get(item.case)!} item={item} />
+        ))}
+      </ul>
+      <div class="mt-10 flex justify-center px-4">
+        <Button variant="secondary" icon="arrow-right" href="/">
+          {work.cta}
+        </Button>
+      </div>
+    </section>
 
+    <div class={container}>
       <!-- Slot: de contactillustratie (de lege kruk) is de uitnodiging. -->
       <section
         id={ids.contact}
@@ -229,7 +238,7 @@ const section = 'mt-28 scroll-mt-12 md:mt-40';
           </Button>
         </div>
       </section>
-    </article>
+    </div>
   </main>
 
   <ChapterNav chapters={chapters} visibleFrom={ids.services} />
@@ -238,3 +247,24 @@ const section = 'mt-28 scroll-mt-12 md:mt-40';
 <script>
   import '../scripts/demos.ts';
 </script>
+
+<style>
+  /*
+   * Entree bij het laden: de elementen t/m de fold komen één voor één binnen (omhoog, uit
+   * de blur). Puur CSS, dus geen flits vóór het script; ook na een navigatie naar deze
+   * pagina. De woorden van de kop zijn inline: die krijgen alleen de fade en de blur.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .enter {
+      animation: enter 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(80ms + var(--i) * 70ms);
+    }
+  }
+  @keyframes enter {
+    from {
+      opacity: 0;
+      filter: blur(6px);
+      transform: translateY(16px);
+    }
+  }
+</style>

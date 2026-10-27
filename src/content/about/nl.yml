@@ -1,5 +1,5 @@
 status: Beschikbaar voor nieuwe projecten
-title: Ik ontwerp producten, websites en merken.
+title: Ik ontwerp merken, websites en producten.
 subtitle: Helder, doordacht en klaar om te bouwen.
 clients:
   label: Eerder werk voor
@@ -17,6 +17,22 @@ clients:
 services:
   title: Wat je bij mij haalt
   items:
+    - title: Brand design
+      body: Eén visueel systeem dat werkt in product én marketing.
+      deliverables:
+        - Beeldmerk
+        - Kleur en typografie
+        - Huisstijlgids
+      color: '#cfe8da'
+      demo: brand
+    - title: Landingspagina's & merkwebsites
+      body: Pagina's die je product snel uitleggen en bezoekers tot actie brengen.
+      deliverables:
+        - Structuur
+        - Responsive ontwerp
+        - Overdracht aan development
+      color: '#ffe3cf'
+      demo: web
     - title: Product design
       body: UX/UI voor dashboards en webapps. Minder verwarring, sneller resultaat.
       deliverables:
@@ -26,24 +42,8 @@ services:
         - Design system
       color: '#c9dde6'
       demo: product
-    - title: Landingspagina's & merkwebsites
-      body: Pagina's die je product snel uitleggen en bezoekers tot actie brengen.
-      deliverables:
-        - Structuur
-        - Responsive ontwerp
-        - Overdracht aan development
-      color: '#ffe3cf'
-      demo: web
-    - title: Brand design
-      body: Eén visueel systeem dat werkt in product én marketing.
-      deliverables:
-        - Beeldmerk
-        - Kleur en typografie
-        - Huisstijlgids
-      color: '#cfe8da'
-      demo: brand
 process:
-  title: Zo werken we
+  title: Mijn werkwijze
   steps:
     - title: Kennismaken
       body: We bespreken je vraag, je doelen en je planning.
@@ -53,18 +53,22 @@ process:
       body: In korte rondes. Je kijkt mee en stuurt bij.
     - title: Opleveren
       body: Bouwklare ontwerpen, met een overdracht aan je developers.
-about:
-  title: Hoi, ik ben Jesse.
-  body: Al vier jaar ontwerp ik voor merken, bij bureaus en in-house. Ik hou van ontwerp dat rustig oogt en tot in de details klopt.
-  facts:
-    - label: 'Nu:'
-      value: Gomibo
-    - label: 'Eerder:'
-      value: Build in Amsterdam
-    - label: 'Stages:'
-      value: Momkai, Dizain, Studio Plakband
-    - label: 'Werkvorm:'
-      value: Per project
+work:
+  title: Geselecteerd werk
+  cta: Bekijk al het werk
+  items:
+    - case: adyen
+      tagline: Website voor een fintech-platform.
+      logo: ../../assets/clients/adyen.svg
+    - case: suitsupply
+      tagline: Configurator voor maatpakken.
+      logo: ../../assets/clients/suitsupply.svg
+    - case: secrid
+      tagline: Webshop voor portemonnees.
+    - case: belsimpel
+      tagline: Webshop voor telefoons.
+      logo: ../../assets/clients/belsimpel.png
+    - case: kc
 closing:
   title: Schuif aan.
   body: Vertel me over je project.
