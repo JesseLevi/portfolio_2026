@@ -23,6 +23,10 @@
   --text-title-lg--line-height: normal;
   --text-title-md: 48px;
   --text-title-md--line-height: normal;
+  --text-title-sm: 36px;
+  --text-title-sm--line-height: normal;
+  --text-title-xs: 28px;
+  --text-title-xs--line-height: normal;
   /* 22px in de mobiele layout, 24px vanaf `lg` (zie :root hieronder). */
   --text-heading: 22px;
   --text-heading--line-height: normal;

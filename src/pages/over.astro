@@ -2,75 +2,239 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Avatar from '../components/Avatar.astro';
 import Button from '../components/Button.astro';
+import ChapterNav from '../components/case/ChapterNav.astro';
 import ServiceCard from '../components/about/ServiceCard.astro';
-import ClientLogos from '../components/about/ClientLogos.astro';
+import illustration from '../assets/about/illustration.svg';
+import contact from '../assets/contact/illustration.svg';
+import contactStatic from '../assets/contact/illustration-static.svg';
 import { getAbout } from '../lib/about';
+import { siteConfig } from '../config';
 import { getLocale, t } from '../i18n';
 
 const locale = getLocale(Astro.currentLocale);
-const about = await getAbout(locale);
-const localTime = t('about.localTime', locale).replace('{city}', about.city);
+const { status, title, subtitle, clients, services, process, about, closing } =
+  await getAbout(locale);
+
+// Hoofdstukken: dezelfde indicator als op de case-pagina (vanaf `lg`).
+const ids = {
+  intro: 'intro',
+  services: 'diensten',
+  process: 'werkwijze',
+  about: 'over-mij',
+  contact: 'contact',
+} as const;
+const chapters = (Object.keys(ids) as (keyof typeof ids)[]).map((key) => ({
+  id: ids[key],
+  name: t(`about.chapter.${key}`, locale),
+}));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: t('site.name', locale),
+  jobTitle: t('site.role', locale),
+  url: new URL('/over', Astro.site).href,
+  email: `mailto:${siteConfig.email}`,
+  sameAs: [siteConfig.linkedin],
+  knowsAbout: services.items.map((s) => s.title),
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: services.title,
+    itemListElement: services.items.map((s) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: s.title, description: s.body },
+    })),
+  },
+};
+
+// Sectiekoppen: 28px mobiel, 48px vanaf `md`.
+const h2 = 'text-title-xs md:text-title-md leading-[1.1]';
+const section = 'mt-28 scroll-mt-12 md:mt-40';
 ---
 
 <BaseLayout
   title={t('about.title', locale)}
   description={t('about.description', locale)}
 >
-  <!-- Eén kolom: intro, expertise, klanten. De onderruimte houdt de nav-pil vrij. -->
-  <main class="mx-auto flex max-w-[1032px] flex-col gap-20 px-6 pt-24 pb-40 lg:gap-24 lg:pt-32">
-    <section class="flex flex-col items-start gap-4">
-      <Avatar />
-      <div class="flex flex-col items-start gap-6">
-        <div class="text-heading flex flex-col gap-1.5">
-          <h1>{t('site.name', locale)}</h1>
-          <p class="text-muted">{t('site.role', locale)}</p>
-        </div>
-        <!-- Status: beschikbaarheid, plus de lokale tijd zodra het script draait (src/scripts/about.ts). -->
-        <p class="text-label text-muted flex items-center gap-2">
+  <script
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+  />
+  <main class="pb-40">
+    <article class="mx-auto max-w-[calc(1026px+2rem)] px-4">
+      <!-- Intro: status, belofte, knoppen en de klanten als bewijs. -->
+      <section
+        id={ids.intro}
+        aria-labelledby="over-titel"
+        class="flex flex-col items-center pt-16 text-center md:pt-28"
+      >
+        <div class="bg-paper shadow-pill text-label flex h-9 items-center gap-2 rounded-full pr-4 pl-1.5">
+          <Avatar size={24} />
           <span class="relative flex size-2" aria-hidden="true">
             <span class="bg-available absolute inset-0 animate-ping rounded-full opacity-60"></span>
             <span class="bg-available relative size-2 rounded-full"></span>
           </span>
-          <span>
-            {about.availability}
-            <span data-local-time data-template={localTime} hidden></span>
-          </span>
-        </p>
-        <Button variant="primary" icon="send" data-open-contact>
-          {t('cta.contact', locale)}
-        </Button>
-      </div>
-    </section>
+          {status}
+        </div>
 
-    <section
-      id="expertise"
-      aria-labelledby="expertise-title"
-      class="flex scroll-mt-24 flex-col gap-4"
-    >
-      <h2 id="expertise-title" class="text-body text-muted">
-        {t('about.expertise', locale)}
-      </h2>
-      <!-- Mobiel een rij om door te vegen (snap per kaart), vanaf `md` drie kolommen. -->
-      <ul
-        tabindex="0"
-        aria-labelledby="expertise-title"
-        class="focus-visible:outline-ink -mx-6 flex snap-x snap-mandatory scroll-px-6 gap-3 overflow-x-auto px-6 [scrollbar-width:none] focus-visible:outline-2 focus-visible:-outline-offset-2 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0"
+        <h1
+          id="over-titel"
+          class="text-title-sm md:text-title-lg mt-8 max-w-[880px] leading-[1.1] text-balance"
+        >
+          {title} <span class="text-muted">{subtitle}</span>
+        </h1>
+
+        <div class="mt-10 flex flex-wrap justify-center gap-4">
+          <Button variant="primary" icon="send" data-open-contact>
+            {t('cta.contact', locale)}
+          </Button>
+          <Button variant="secondary" icon="arrow-right" href="/">
+            {t('about.work', locale)}
+          </Button>
+        </div>
+
+        <div class="mt-20 md:mt-24">
+          <p class="text-body text-muted">{clients.label}</p>
+          <ul class="text-heading mt-4 flex flex-wrap justify-center gap-x-8 gap-y-2">
+            {clients.items.map(({ name, case: slug }) => (
+              <li>
+                {slug ? (
+                  <a
+                    href={`/werk/${slug}`}
+                    class="text-muted hover:text-ink focus-visible:outline-ink rounded-sm transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4"
+                  >
+                    {name}
+                  </a>
+                ) : (
+                  <span class="text-muted">{name}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <!-- Diensten: elk met een levend UI-fragment (src/scripts/demos.ts). -->
+      <section
+        id={ids.services}
+        aria-labelledby="diensten-titel"
+        class={section}
       >
-        {about.services.map((service, index) => (
-          <ServiceCard service={service} index={index} />
-        ))}
-      </ul>
-    </section>
+        <h2 id="diensten-titel" class:list={[h2, 'text-center']}>
+          {services.title}
+        </h2>
+        <ul class="mt-10 grid gap-y-16 md:mt-14 lg:grid-cols-3 lg:gap-x-2 lg:gap-y-0">
+          {services.items.map((service) => (
+            <ServiceCard service={service} />
+          ))}
+        </ul>
+      </section>
 
-    <section aria-labelledby="clients-title" class="flex flex-col gap-6">
-      <h2 id="clients-title" class="text-body text-muted">
-        {t('about.clients', locale)}
-      </h2>
-      <ClientLogos clients={about.clients} />
-    </section>
+      <section
+        id={ids.process}
+        aria-labelledby="werkwijze-titel"
+        class={section}
+      >
+        <h2 id="werkwijze-titel" class:list={[h2, 'text-center']}>
+          {process.title}
+        </h2>
+        <ol class="mt-10 grid grid-cols-2 gap-x-2 gap-y-10 md:mt-14 lg:grid-cols-4">
+          {process.steps.map((step, i) => (
+            <li class="border-rule border-t px-1 pt-4">
+              <span
+                class="text-body text-muted tabular-nums"
+                aria-hidden="true"
+              >
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 class="text-heading mt-6">{step.title}</h3>
+              <p class="text-body text-muted mt-2">{step.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <!-- Over mij: het dubbele blok van de case, met de illustratie links en tekst rechts. -->
+      <section
+        id={ids.about}
+        aria-labelledby="over-mij-titel"
+        class:list={[section, 'grid gap-y-10 md:grid-cols-2 md:gap-x-2']}
+      >
+        <div class="bg-panel flex aspect-4/5 items-center justify-center rounded-lg md:rounded-2xl">
+          <img
+            src={illustration.src}
+            width={illustration.width}
+            height={illustration.height}
+            alt={t('about.illustration', locale)}
+            loading="lazy"
+            decoding="async"
+            class="h-auto w-[80%]"
+          />
+        </div>
+        <div class="flex flex-col justify-center px-1 md:px-12">
+          <h2 id="over-mij-titel" class={h2}>
+            {about.title}
+          </h2>
+          <p class="text-body text-muted mt-4 max-w-[36ch]">{about.body}</p>
+          <dl class="text-body mt-10 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3">
+            {about.facts.map(({ label, value }) => (
+              <>
+                <dt class="text-muted">{label}</dt>
+                <dd>{value}</dd>
+              </>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <!-- Slot: de contactillustratie (de lege kruk) is de uitnodiging. -->
+      <section
+        id={ids.contact}
+        aria-labelledby="contact-titel"
+        class:list={[section, 'flex flex-col items-center text-center']}
+      >
+        <!-- <img> en lazy: de animatie begint pas als hij geladen wordt, dus vlak voor hij in beeld komt. -->
+        <picture>
+          <source
+            media="(prefers-reduced-motion: reduce)"
+            srcset={contactStatic.src}
+          />
+          <img
+            src={contact.src}
+            width={contact.width}
+            height={contact.height}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            class="h-auto w-[260px] md:w-[340px]"
+          />
+        </picture>
+        <h2 id="contact-titel" class:list={[h2, 'mt-8']}>
+          {closing.title}
+        </h2>
+        <p class="text-body text-muted mt-3">{closing.body}</p>
+        <div class="mt-8 flex flex-wrap justify-center gap-4">
+          <Button href={`mailto:${siteConfig.email}`} icon="mail">
+            {t('contact.mail.cta', locale)}
+          </Button>
+          <Button
+            variant="secondary"
+            href={siteConfig.linkedin}
+            icon="send"
+            target="_blank"
+            rel="noopener"
+          >
+            {t('contact.linkedin.cta', locale)}
+          </Button>
+        </div>
+      </section>
+    </article>
   </main>
+
+  <ChapterNav chapters={chapters} visibleFrom={ids.services} />
 </BaseLayout>
 
 <script>
-  import '../scripts/about.ts';
+  import '../scripts/demos.ts';
 </script>

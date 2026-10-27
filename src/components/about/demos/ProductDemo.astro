@@ -1,0 +1,60 @@
+---
+// Product: een dashboardkaart. De staafjes groeien, de cursor kiest "Maand" en de data wisselt.
+import Cursor from './Cursor.astro';
+
+// Hoogte per staaf (0-1): a = week, b = maand. De hoogste staaf is zwart.
+const week = [0.42, 0.58, 0.5, 0.74, 0.92, 0.36, 0.28];
+const month = [0.46, 0.52, 0.6, 0.58, 0.7, 0.82, 0.96];
+const hiWeek = week.indexOf(Math.max(...week));
+const hiMonth = month.indexOf(Math.max(...month));
+---
+
+<div class="demo" data-demo>
+  <div class="demo-sheet dp">
+    <div class="dp-head">
+      <div>
+        <div class="demo-label">Omzet</div>
+        <div class="dp-value demo-swap">
+          <span class="demo-a">€ 12.480</span>
+          <span class="demo-b">€ 51.920</span>
+        </div>
+        <div class="dp-delta demo-swap">
+          <span class="demo-a">▲ 12% t.o.v. vorige week</span>
+          <span class="demo-b">▲ 8% t.o.v. vorige maand</span>
+        </div>
+      </div>
+      <div class="dp-seg">
+        <span class="dp-thumb"></span>
+        <span class="dp-opt">Week</span>
+        <span class="dp-opt demo-target">
+          Maand
+          <Cursor />
+        </span>
+      </div>
+    </div>
+    <div class="dp-chart">
+      {week.map((a, i) => (
+        <span
+          class:list={[
+            'dp-bar',
+            i === hiWeek && 'dp-hi-a',
+            i === hiMonth && 'dp-hi-b',
+          ]}
+          style={`--a: ${a}; --b: ${month[i]}; --i: ${i}`}
+        />
+      ))}
+    </div>
+    <div class="dp-axis demo-swap">
+      <div class="demo-a">
+        {['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'].map((d) => (
+          <span>{d}</span>
+        ))}
+      </div>
+      <div class="demo-b">
+        {['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul'].map((m) => (
+          <span>{m}</span>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>

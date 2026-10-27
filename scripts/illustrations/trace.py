@@ -20,6 +20,9 @@ Een laag:
   also_ink    lijnen in deze polygonen tekent de laag óók, over de snede heen
   seam_exclude  geen naadoverlap in deze polygonen (bv. een tafelpoot naast de schoen)
   clip_seed   punt in het gezichtsvlak; de laag wordt daarop geknipt
+
+Zonder `css` en zonder lagen komt er een stilstaande SVG uit. Met `fill` op het hoogste niveau
+krijgt de basislaag een witte onderlaag: de tekening blijft dan wit op een gekleurd vlak.
 """
 
 import json
@@ -123,12 +126,12 @@ def main():
 
     def base_fill(m):
         f = (own == m) & silhouette
-        if 'fill_poly' in by_name[m]:
+        if 'fill_poly' in by_name.get(m, {}):
             f &= poly_mask(black.shape, by_name[m]['fill_poly'])
         return f
 
     out = {}
-    for l in [{'name': 'body'}] + layers:
+    for l in [{'name': 'body', 'fill': spec.get('fill', False)}] + layers:
         n = l['name']
         ink = (own == n) & black
         if n != 'body':
@@ -178,12 +181,12 @@ def main():
             )
         return g
 
-    css = minify_css(open(os.path.join(here, spec['css'])).read())
+    css = minify_css(open(os.path.join(here, spec['css'])).read()) if 'css' in spec else ''
     extras = open(os.path.join(here, spec['extras'])).read().strip() if 'extras' in spec else ''
     body = paths('body') + extras + ''.join(group(m) for m in parent if parent[m] is None)
     cls = f' class="{spec["class"]}"' if 'class' in spec else ''
     head = f'<svg xmlns="http://www.w3.org/2000/svg"{cls} width="{W}" height="{H}" viewBox="0 0 {W} {H}">'
-    files = [(spec['out'], f'<style>{css}</style>')]
+    files = [(spec['out'], f'<style>{css}</style>' if css else '')]
     if spec.get('static'):
         # Een stilstaande variant voor een SVG in een <img>: de pagina kiest die bij reduced
         # motion via <picture>, want niet elke browser geeft die voorkeur door aan het beeld.

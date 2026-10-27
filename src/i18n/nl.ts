@@ -28,10 +28,16 @@ export const nl = {
   // over
   'about.title': 'Over | Jesse Kamps',
   'about.description':
-    'Jesse Kamps is freelance designer voor web en identiteit: product design, landingspagina’s en brand design.',
-  'about.expertise': 'Expertise',
-  'about.clients': 'Gewerkt voor',
-  'about.localTime': '{time} in {city}',
+    'Jesse Kamps ontwerpt producten, websites en merken. Per project, van eerste schets tot bouwklaar ontwerp.',
+  'about.work': 'Bekijk werk',
+  'about.deliverables': 'Wat je krijgt',
+  'about.illustration':
+    'Illustratie van Jesse aan zijn bureau, schetsend naast een scherm met een website.',
+  'about.chapter.intro': 'Intro',
+  'about.chapter.services': 'Diensten',
+  'about.chapter.process': 'Werkwijze',
+  'about.chapter.about': 'Over mij',
+  'about.chapter.contact': 'Contact',
   // 404
   'notFound.title': 'Pagina niet gevonden',
   'notFound.description': 'Deze pagina bestaat niet (meer).',

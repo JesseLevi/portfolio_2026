@@ -76,29 +76,43 @@ const about = defineCollection({
     base: './src/content/about',
     generateId: ({ entry }) => entry.replace(/\.yml$/, ''),
   }),
-  schema: ({ image }) => {
-    const hex = z.string().regex(HEX_COLOR, 'Gebruik een hexkleur als #efefef');
+  schema: () => {
+    const text = z.object({ title: z.string(), body: z.string() });
 
     return z.object({
-      // Statusregel bovenaan, bv. "Beschikbaar vanaf januari".
-      availability: z.string(),
-      // Stad bij de lokale tijd (de tijdzone is altijd Europe/Amsterdam).
-      city: z.string(),
-      services: z.array(
-        z.object({
-          title: z.string(),
-          body: z.string(),
-          // Drie kleuren van de bewegende pil: vlak, vlek en licht.
-          gradient: z.object({ base: hex, accent: hex, light: hex }),
-        }),
-      ),
-      clients: z.array(
-        z.object({
-          name: z.string(),
-          // Zonder logo staat de naam er als tekst.
-          logo: image().optional(),
-        }),
-      ),
+      // Statuspil boven de kop.
+      status: z.string(),
+      // De kop: zwart, met de ondertitel in grijs erachter.
+      title: z.string(),
+      subtitle: z.string(),
+      clients: z.object({
+        label: z.string(),
+        // `case` is de slug van een case; dan linkt de naam ernaartoe (getAbout() controleert hem).
+        items: z.array(
+          z.object({ name: z.string(), case: z.string().optional() }),
+        ),
+      }),
+      services: z.object({
+        title: z.string(),
+        items: z.array(
+          z.object({
+            title: z.string(),
+            body: z.string(),
+            deliverables: z.array(z.string()),
+            // Kleur van het blok achter het fragment.
+            color,
+            // Welk levend UI-fragment in het blok staat (code, geen upload).
+            demo: z.enum(['product', 'web', 'brand']),
+          }),
+        ),
+      }),
+      process: z.object({ title: z.string(), steps: z.array(text) }),
+      about: z.object({
+        title: z.string(),
+        body: z.string(),
+        facts: z.array(z.object({ label: z.string(), value: z.string() })),
+      }),
+      closing: text,
     });
   },
 });
