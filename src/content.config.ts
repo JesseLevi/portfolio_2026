@@ -69,4 +69,38 @@ const cases = defineCollection({
   },
 });
 
-export const collections = { cases };
+const about = defineCollection({
+  // Eén YAML-bestand per taal: about/nl.yml. Het id is de taal.
+  loader: glob({
+    pattern: '*.yml',
+    base: './src/content/about',
+    generateId: ({ entry }) => entry.replace(/\.yml$/, ''),
+  }),
+  schema: ({ image }) => {
+    const hex = z.string().regex(HEX_COLOR, 'Gebruik een hexkleur als #efefef');
+
+    return z.object({
+      // Statusregel bovenaan, bv. "Beschikbaar vanaf januari".
+      availability: z.string(),
+      // Stad bij de lokale tijd (de tijdzone is altijd Europe/Amsterdam).
+      city: z.string(),
+      services: z.array(
+        z.object({
+          title: z.string(),
+          body: z.string(),
+          // Drie kleuren van de bewegende pil: vlak, vlek en licht.
+          gradient: z.object({ base: hex, accent: hex, light: hex }),
+        }),
+      ),
+      clients: z.array(
+        z.object({
+          name: z.string(),
+          // Zonder logo staat de naam er als tekst.
+          logo: image().optional(),
+        }),
+      ),
+    });
+  },
+});
+
+export const collections = { cases, about };

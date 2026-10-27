@@ -39,8 +39,7 @@ const centered = align === 'center';
         {t('cta.contact', locale)}
       </Button>
       {!centered && (
-        // TODO: linkt naar de pagina "Over" zodra die er is (dan <Button href>).
-        <Button variant="secondary" icon="person" decorative>
+        <Button variant="secondary" icon="person" href="/over#expertise">
           {t('cta.expertise', locale)}
         </Button>
       )}

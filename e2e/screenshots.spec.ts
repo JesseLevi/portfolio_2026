@@ -5,7 +5,7 @@ import { join } from 'node:path';
 // Uitbreiden via deze array of de env var SCREENSHOT_ROUTES (komma-gescheiden), bv. "/,/cases/foo".
 const routes = process.env.SCREENSHOT_ROUTES
   ? process.env.SCREENSHOT_ROUTES.split(',').map((r) => r.trim())
-  : ['/'];
+  : ['/', '/over'];
 
 const routeName = (route: string) =>
   route.replace(/^\/+|\/+$/g, '').replace(/\//g, '-') || 'index';

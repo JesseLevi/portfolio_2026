@@ -9,8 +9,81 @@ media:
     input: src/assets/cases
     output: ../../../assets/cases
     categories: [image]
+  # Logo's op de pagina "Over". Het pad is relatief aan src/content/about/<taal>.yml.
+  - name: logos
+    label: Klantlogo's
+    input: src/assets/clients
+    output: ../../assets/clients
+    categories: [image]
 
 content:
+  - name: about-nl
+    label: Over (NL)
+    type: file
+    path: src/content/about/nl.yml
+    format: yaml
+    fields:
+      - name: availability
+        label: Beschikbaarheid
+        type: string
+        required: true
+      - name: city
+        label: Stad (bij de lokale tijd)
+        type: string
+        required: true
+      - name: services
+        label: Expertise
+        type: object
+        list: true
+        fields:
+          - name: title
+            label: Titel
+            type: string
+            required: true
+          - name: body
+            label: Tekst
+            type: text
+            required: true
+          - name: gradient
+            label: Kleuren van de pil
+            type: object
+            required: true
+            fields:
+              - name: base
+                label: Vlak
+                type: string
+                required: true
+                pattern:
+                  regex: '^#[0-9a-fA-F]{6}$'
+                  message: Hexkleur, bijvoorbeeld #1a7cff
+              - name: accent
+                label: Vlek
+                type: string
+                required: true
+                pattern:
+                  regex: '^#[0-9a-fA-F]{6}$'
+                  message: Hexkleur, bijvoorbeeld #2ee6ff
+              - name: light
+                label: Licht
+                type: string
+                required: true
+                pattern:
+                  regex: '^#[0-9a-fA-F]{6}$'
+                  message: Hexkleur, bijvoorbeeld #8fd9ff
+      - name: clients
+        label: Gewerkt voor
+        type: object
+        list: true
+        fields:
+          - name: name
+            label: Naam
+            type: string
+            required: true
+          - name: logo
+            label: Logo (SVG of PNG; zonder logo staat de naam er)
+            type: image
+            media: logos
+
   - name: cases-nl
     label: Cases (NL)
     type: collection

@@ -1,0 +1,30 @@
+availability: Beschikbaar vanaf januari
+city: Amsterdam
+services:
+  - title: Product Design
+    body: Heldere UX/UI voor dashboards en webapps, die verwarring wegneemt en gebruikers sneller laat doen wat ze komen doen.
+    gradient:
+      base: '#1a7cff'
+      accent: '#2ee6ff'
+      light: '#8fd9ff'
+  - title: Landingspagina's & merkwebsites
+    body: Heldere, goed opgebouwde pagina's die je product snel uitleggen en bezoekers tot actie brengen.
+    gradient:
+      base: '#ff7a33'
+      accent: '#ff6fae'
+      light: '#ffd6ec'
+  - title: Brand Design
+    body: Eenvoudige, consistente visuele systemen die werken in product én marketing, zonder te overdesignen.
+    gradient:
+      base: '#1d2621'
+      accent: '#4b6656'
+      light: '#c9d9cf'
+clients:
+  - name: Adyen
+    logo: ../../assets/clients/adyen.svg
+  - name: Suitsupply
+    logo: ../../assets/clients/suitsupply.svg
+  - name: Secrid
+  - name: Belsimpel
+    logo: ../../assets/clients/belsimpel.png
+  - name: KC

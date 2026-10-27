@@ -1,0 +1,101 @@
+---
+// Expertisekaart: een bewegende gradient-pil met titel en één zin eronder.
+// De pil drijft langzaam (CSS); bij hover volgt het licht de cursor (src/scripts/about.ts).
+import type { Service } from '../../lib/about';
+
+interface Props {
+  service: Service;
+  /** Volgnummer: elke pil begint op een ander punt van de beweging. */
+  index: number;
+}
+
+const { service, index } = Astro.props;
+const { base, accent, light } = service.gradient;
+---
+
+<li
+  data-service-card
+  class="border-rule bg-paper flex w-[min(78vw,320px)] shrink-0 snap-start flex-col rounded-2xl border md:w-auto"
+>
+  <div class="flex h-50 items-center justify-center px-4">
+    <div
+      data-pill
+      aria-hidden="true"
+      class="pill relative aspect-5/2 w-[62%] overflow-hidden rounded-full"
+      style={`--base: ${base}; --accent: ${accent}; --light: ${light}; --delay: ${index * -7}s;`}
+    >
+      <span class="grain absolute inset-0"></span>
+    </div>
+  </div>
+  <div class="flex flex-col gap-1 px-4 pt-2 pb-4">
+    <h3 class="text-body">{service.title}</h3>
+    <p class="text-body text-muted">{service.body}</p>
+  </div>
+</li>
+
+<style>
+  /* Het licht schuift (als transition) naar de cursor; daarvoor moeten de waarden getypt
+     zijn. `inherits: true`, anders ziet ::after de waarden van .pill niet. */
+  @property --pill-x {
+    syntax: '<percentage>';
+    inherits: true;
+    initial-value: 72%;
+  }
+  @property --pill-y {
+    syntax: '<percentage>';
+    inherits: true;
+    initial-value: 78%;
+  }
+
+  .pill {
+    background-color: var(--base);
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);
+    transition:
+      --pill-x 600ms cubic-bezier(0.22, 1, 0.36, 1),
+      --pill-y 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Vlekken: een groter vlak dat langzaam drijft. Alleen transform, dus op de GPU. */
+  .pill::before {
+    content: '';
+    position: absolute;
+    inset: -60% -30%;
+    background:
+      radial-gradient(28% 42% at 30% 45%, var(--accent), transparent 70%),
+      radial-gradient(24% 38% at 68% 58%, var(--accent), transparent 70%),
+      radial-gradient(20% 30% at 52% 36%, var(--light), transparent 70%);
+    filter: blur(6px);
+    animation: pill-drift 21s ease-in-out var(--delay) infinite alternate;
+  }
+
+  /* Licht: volgt de cursor. */
+  .pill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at var(--pill-x) var(--pill-y),
+      rgb(255 255 255 / 0.5),
+      transparent 30%
+    );
+  }
+
+  /* Korrel, zoals in de inspiratie. */
+  .grain {
+    z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: soft-light;
+  }
+
+  @keyframes pill-drift {
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    50% {
+      transform: translate(14%, -10%) rotate(14deg);
+    }
+    100% {
+      transform: translate(-12%, 8%) rotate(-10deg);
+    }
+  }
+</style>
