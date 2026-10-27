@@ -1,0 +1,462 @@
+/*
+ * Levende UI-fragmenten op de pagina "Over" (gedrag: src/scripts/demos.ts).
+ *
+ * Maat: 1em = 10 ontwerp-px van een fragment van 240x160. Het fragment schaalt mee met
+ * het blok (container query: 80% van de breedte of 76% van de hoogte, maximaal 13px per em).
+ * Radius (8px) en schaduw (shadow-shot) schalen niet mee, zoals bij elke screenshot op de site.
+ *
+ * Staten via data-state op .demo: idle -> build -> aim -> press -> done. Alle drie de
+ * fragmenten volgen hetzelfde ritme: opbouwen, de cursor gaat naar een bediening, klikt,
+ * en het fragment reageert. Zonder data-state (geen JS, reduced motion) staat de eindstaat
+ * er, dus de standaardregels hieronder beschrijven die; de vroege staten overschrijven ze.
+ */
+
+.demo-stage {
+  container-type: size;
+}
+
+.demo {
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  width: 24em;
+  height: 16em;
+  font-size: min(calc(80cqw / 24), calc(76cqh / 16), 13px);
+  line-height: 1.2;
+  text-align: left;
+  user-select: none;
+}
+
+/* Terugzetten naar het begin gebeurt zonder animatie. */
+.demo[data-instant],
+.demo[data-instant] * {
+  transition: none !important;
+}
+
+.demo-sheet {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  background: var(--color-paper);
+  box-shadow: var(--shadow-shot);
+}
+
+.demo-label {
+  color: var(--color-muted);
+}
+
+/* Twee waarden op dezelfde plek: a vóór de klik, b erna. */
+.demo-swap {
+  display: grid;
+}
+.demo-swap > * {
+  grid-area: 1 / 1;
+  transition:
+    opacity 250ms ease,
+    transform 400ms var(--ease);
+}
+.demo-a {
+  opacity: 0;
+  transform: translateY(-0.3em);
+}
+.demo:is([data-state='idle'], [data-state='build'], [data-state='aim'])
+  .demo-a {
+  opacity: 1;
+  transform: none;
+}
+.demo:is([data-state='idle'], [data-state='build'], [data-state='aim'])
+  .demo-b {
+  opacity: 0;
+  transform: translateY(0.3em);
+}
+
+/*
+ * De cursor van de site (public/cursor), op het doel gezet: de hotspot (4, 2) valt op het
+ * midden van de bediening. Hij komt van rechtsonder, klikt, en schuift daarna een stukje weg.
+ */
+.demo-cursor {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  z-index: 3;
+  width: 2.8em;
+  height: 2.8em;
+  max-width: none;
+  margin: -0.2em 0 0 -0.4em;
+  transform: translate(1.2em, 1.4em);
+  transform-origin: 0.4em 0.2em;
+  pointer-events: none;
+  transition:
+    transform 1200ms var(--ease),
+    opacity 300ms ease;
+}
+.demo:is([data-state='idle'], [data-state='build']) .demo-cursor {
+  opacity: 0;
+  transform: translate(7em, 6em);
+}
+.demo[data-state='aim'] .demo-cursor {
+  transform: none;
+  transition-duration: 800ms, 300ms;
+}
+.demo[data-state='press'] .demo-cursor {
+  transform: scale(0.86);
+  transition-duration: 120ms;
+}
+
+/* ── Product: dashboardkaart met een segment Week | Maand ─────────────────── */
+
+.dp {
+  padding: 1.4em 1.6em 1.2em;
+}
+.dp-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.dp-value {
+  margin-top: 0.15em;
+  font-size: 2.2em;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.dp-delta {
+  margin-top: 0.3em;
+  font-size: 0.9em;
+  color: #15803d;
+}
+
+.dp-seg {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0.25em;
+  border-radius: 999px;
+  background: var(--color-pill);
+  font-size: 0.9em;
+}
+.dp-opt {
+  position: relative;
+  z-index: 1;
+  padding: 0.35em 0.75em;
+  text-align: center;
+  color: var(--color-muted);
+  transition: color 200ms ease;
+}
+.dp-opt.demo-target {
+  color: var(--color-ink);
+}
+.dp-thumb {
+  position: absolute;
+  top: 0.25em;
+  bottom: 0.25em;
+  left: 0.25em;
+  width: calc(50% - 0.25em);
+  border-radius: 999px;
+  background: var(--color-paper);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+  transform: translateX(100%);
+  transition: transform 350ms var(--ease);
+}
+.demo:is([data-state='idle'], [data-state='build'], [data-state='aim'])
+  .dp-thumb {
+  transform: none;
+}
+.demo:is([data-state='idle'], [data-state='build'], [data-state='aim'])
+  .dp-opt:not(.demo-target) {
+  color: var(--color-ink);
+}
+.demo:is([data-state='idle'], [data-state='build'], [data-state='aim'])
+  .dp-opt.demo-target {
+  color: var(--color-muted);
+}
+
+.dp-chart {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.6em;
+  align-items: end;
+  height: 5.6em;
+  margin-top: auto;
+}
+.dp-bar {
+  height: calc(var(--b) * 100%);
+  border-radius: 0.3em;
+  background: var(--color-faint);
+  transition:
+    height 700ms var(--ease) calc(var(--i) * 45ms),
+    background-color 300ms ease;
+}
+.dp-bar.dp-hi-b {
+  background: var(--color-ink);
+}
+.demo:is([data-state='build'], [data-state='aim']) .dp-bar {
+  height: calc(var(--a) * 100%);
+}
+.demo[data-state='idle'] .dp-bar {
+  height: 4%;
+}
+.demo:is([data-state='idle'], [data-state='build'], [data-state='aim'])
+  .dp-bar.dp-hi-b {
+  background: var(--color-faint);
+}
+.demo:is([data-state='idle'], [data-state='build'], [data-state='aim'])
+  .dp-bar.dp-hi-a {
+  background: var(--color-ink);
+}
+
+.dp-axis {
+  margin-top: 0.5em;
+  font-size: 0.8em;
+  color: var(--color-muted);
+}
+.dp-axis > * {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.75em;
+  text-align: center;
+}
+
+/* ── Web: een browser met een landingspagina en een CTA ───────────────────── */
+
+.dw-bar {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.4em;
+  align-items: center;
+  height: 2em;
+  padding: 0 0.9em;
+  border-bottom: 1px solid var(--color-pill);
+}
+.dw-dot {
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: var(--color-faint);
+}
+.dw-url {
+  width: 9em;
+  height: 1em;
+  margin: 0 auto;
+  border-radius: 999px;
+  background: var(--color-pill);
+  /* Midden van de balk, ondanks de stippen links. */
+  transform: translateX(-1em);
+}
+.dw-page {
+  position: relative;
+  flex: 1;
+  padding: 1em 1.6em 0;
+  overflow: hidden;
+  border-radius: 0 0 8px 8px;
+}
+.dw-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.9em;
+}
+.dw-logo {
+  display: flex;
+  gap: 0.4em;
+  align-items: center;
+}
+.dw-logo::before {
+  content: '';
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 50%;
+  background: var(--color-ink);
+}
+.dw-links {
+  display: flex;
+  gap: 0.6em;
+}
+.dw-links > span {
+  width: 2em;
+  height: 0.4em;
+  border-radius: 999px;
+  background: var(--color-faint);
+}
+.dw-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1.3em;
+  text-align: center;
+}
+.dw-h {
+  max-width: 10.5em;
+  font-size: 1.7em;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.dw-s {
+  margin-top: 0.5em;
+  font-size: 0.9em;
+  color: var(--color-muted);
+}
+.dw-cta {
+  position: relative;
+  display: inline-flex;
+  margin-top: 1em;
+  padding: 0.5em 1.1em;
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-size: 0.9em;
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease;
+}
+.demo[data-state='press'] .dw-cta {
+  transform: scale(0.95);
+  background: var(--color-ink-hover);
+}
+.dw-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6em;
+  margin-top: 1.6em;
+}
+.dw-tiles > span {
+  height: 4em;
+  border-radius: 0.4em;
+  background: var(--color-pill);
+}
+.dw-in {
+  transition:
+    opacity 500ms ease calc(var(--i) * 90ms),
+    transform 700ms var(--ease) calc(var(--i) * 90ms);
+}
+.demo[data-state='idle'] .dw-in {
+  opacity: 0;
+  transform: translateY(0.8em);
+}
+
+.dw-done {
+  display: inline-flex;
+  gap: 0.35em;
+  align-items: center;
+  justify-content: center;
+}
+.dw-done svg {
+  width: 1em;
+  height: 1em;
+  color: var(--color-available);
+}
+
+/* ── Merk: beeldmerk, letter en palet ─────────────────────────────────────── */
+
+.db {
+  padding: 1.4em 1.6em;
+}
+.db-main {
+  display: flex;
+  gap: 2.4em;
+  align-items: center;
+  margin-top: 1.1em;
+}
+.db-mark {
+  display: grid;
+  grid-template-columns: repeat(2, 2.4em);
+  gap: 0.3em;
+}
+.db-shape {
+  width: 2.4em;
+  height: 2.4em;
+  background: var(--color-ink);
+  transition:
+    transform 800ms var(--ease) calc(var(--i) * 80ms),
+    opacity 400ms ease calc(var(--i) * 80ms),
+    background-color 400ms ease;
+}
+.db-shape:nth-child(1) {
+  --x: -2em;
+  --y: -1.4em;
+  --r: -90deg;
+  border-radius: 100% 0 0;
+}
+.db-shape:nth-child(2) {
+  --x: 1.6em;
+  --y: -1.8em;
+  --r: 0deg;
+  border-radius: 50%;
+  background: var(--accent-b);
+}
+.db-shape:nth-child(3) {
+  --x: -1.6em;
+  --y: 1.8em;
+  --r: 45deg;
+  border-radius: 0.3em;
+}
+.db-shape:nth-child(4) {
+  --x: 2em;
+  --y: 1.4em;
+  --r: 90deg;
+  border-radius: 0 0 100%;
+}
+.demo[data-state='idle'] .db-shape {
+  opacity: 0;
+  transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(0.6);
+}
+.demo:is([data-state='idle'], [data-state='build'], [data-state='aim'])
+  .db-shape:nth-child(2) {
+  background: var(--accent-a);
+}
+.db-type {
+  display: flex;
+  flex-direction: column;
+  transition:
+    opacity 500ms ease 250ms,
+    transform 700ms var(--ease) 250ms;
+}
+.demo[data-state='idle'] .db-type {
+  opacity: 0;
+  transform: translateY(0.6em);
+}
+.db-aa {
+  font-size: 4.6em;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.db-name {
+  margin-top: 0.4em;
+  font-size: 0.9em;
+  color: var(--color-muted);
+}
+.db-swatches {
+  display: flex;
+  gap: 0.8em;
+  margin-top: auto;
+}
+.db-swatch {
+  position: relative;
+  width: 2.2em;
+  height: 2.2em;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);
+  transition:
+    transform 500ms var(--ease) calc(400ms + var(--i) * 60ms),
+    box-shadow 250ms ease;
+}
+.db-swatch.demo-target {
+  box-shadow:
+    0 0 0 0.2em var(--color-paper),
+    0 0 0 0.32em var(--color-ink);
+}
+.demo:is([data-state='idle'], [data-state='build'], [data-state='aim'])
+  .db-swatch.demo-target {
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);
+}
+.demo:is([data-state='idle'], [data-state='build'], [data-state='aim'])
+  .db-swatch.db-was {
+  box-shadow:
+    0 0 0 0.2em var(--color-paper),
+    0 0 0 0.32em var(--color-ink);
+}
+.demo[data-state='idle'] .db-swatch {
+  transform: scale(0);
+}

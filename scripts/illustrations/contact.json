@@ -4,6 +4,7 @@
   "class": "contact-illustration",
   "css": "contact.css",
   "extras": "contact.extras.svg",
+  "static": true,
   "layers": [
     {
       "name": "head",

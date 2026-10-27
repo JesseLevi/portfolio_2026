@@ -9,12 +9,6 @@ media:
     input: src/assets/cases
     output: ../../../assets/cases
     categories: [image]
-  # Logo's op de pagina "Over". Het pad is relatief aan src/content/about/<taal>.yml.
-  - name: logos
-    label: Klantlogo's
-    input: src/assets/clients
-    output: ../../assets/clients
-    categories: [image]
 
 content:
   - name: about-nl
@@ -23,66 +17,137 @@ content:
     path: src/content/about/nl.yml
     format: yaml
     fields:
-      - name: availability
-        label: Beschikbaarheid
+      - name: status
+        label: Status (pil boven de kop)
         type: string
         required: true
-      - name: city
-        label: Stad (bij de lokale tijd)
+      - name: title
+        label: Kop (zwart)
         type: string
         required: true
-      - name: services
-        label: Expertise
+      - name: subtitle
+        label: Ondertitel (grijs, achter de kop)
+        type: string
+        required: true
+      - name: clients
+        label: Klanten
         type: object
-        list: true
+        fields:
+          - name: label
+            label: Label
+            type: string
+            required: true
+          - name: items
+            label: Namen
+            type: object
+            list: true
+            fields:
+              - name: name
+                label: Naam
+                type: string
+                required: true
+              - name: case
+                label: Case (slug; dan linkt de naam ernaartoe)
+                type: string
+      - name: services
+        label: Diensten
+        type: object
         fields:
           - name: title
-            label: Titel
+            label: Kop
+            type: string
+            required: true
+          - name: items
+            label: Diensten
+            type: object
+            list: true
+            fields:
+              - name: title
+                label: Titel
+                type: string
+                required: true
+              - name: body
+                label: Tekst
+                type: text
+                required: true
+              - name: deliverables
+                label: Wat je krijgt
+                type: string
+                list: true
+              - name: color
+                label: Kleur van het blok
+                type: string
+                default: '#efefef'
+                pattern:
+                  regex: '^#[0-9a-fA-F]{6}$'
+                  message: Hexkleur, bijvoorbeeld #efefef
+              - name: demo
+                label: Fragment
+                type: select
+                required: true
+                options:
+                  values:
+                    - { name: product, label: Product (dashboard) }
+                    - { name: web, label: Web (landingspagina) }
+                    - { name: brand, label: Merk (huisstijl) }
+      - name: process
+        label: Werkwijze
+        type: object
+        fields:
+          - name: title
+            label: Kop
+            type: string
+            required: true
+          - name: steps
+            label: Stappen
+            type: object
+            list: true
+            fields:
+              - name: title
+                label: Titel
+                type: string
+                required: true
+              - name: body
+                label: Tekst
+                type: string
+                required: true
+      - name: about
+        label: Over mij
+        type: object
+        fields:
+          - name: title
+            label: Kop
             type: string
             required: true
           - name: body
             label: Tekst
             type: text
             required: true
-          - name: gradient
-            label: Kleuren van de pil
+          - name: facts
+            label: Feiten
             type: object
-            required: true
+            list: true
             fields:
-              - name: base
-                label: Vlak
+              - name: label
+                label: Label (met dubbele punt)
                 type: string
                 required: true
-                pattern:
-                  regex: '^#[0-9a-fA-F]{6}$'
-                  message: Hexkleur, bijvoorbeeld #1a7cff
-              - name: accent
-                label: Vlek
+              - name: value
+                label: Waarde
                 type: string
                 required: true
-                pattern:
-                  regex: '^#[0-9a-fA-F]{6}$'
-                  message: Hexkleur, bijvoorbeeld #2ee6ff
-              - name: light
-                label: Licht
-                type: string
-                required: true
-                pattern:
-                  regex: '^#[0-9a-fA-F]{6}$'
-                  message: Hexkleur, bijvoorbeeld #8fd9ff
-      - name: clients
-        label: Gewerkt voor
+      - name: closing
+        label: Slot
         type: object
-        list: true
         fields:
-          - name: name
-            label: Naam
+          - name: title
+            label: Kop
             type: string
             required: true
-          - name: logo
-            label: Logo (SVG of PNG; zonder logo staat de naam er)
-            type: image
-            media: logos
+          - name: body
+            label: Tekst
+            type: string
+            required: true
 
   - name: cases-nl
     label: Cases (NL)

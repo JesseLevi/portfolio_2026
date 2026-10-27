@@ -1,7 +1,7 @@
 ---
 // Stroke-iconen uit Figma (viewBox 16, sluiten en pijl 20). Kleur via `currentColor`.
 export type IconName =
-  'home' | 'person' | 'send' | 'mail' | 'close' | 'arrow-left';
+  'home' | 'person' | 'send' | 'mail' | 'close' | 'arrow-left' | 'arrow-right';
 
 interface Props {
   name: IconName;
@@ -10,7 +10,8 @@ interface Props {
 }
 
 const { name, size = 16, class: className } = Astro.props;
-const large = name === 'close' || name === 'arrow-left';
+const large =
+  name === 'close' || name === 'arrow-left' || name === 'arrow-right';
 const viewBox = large ? 20 : 16;
 const strokeWidth = large ? 1.66667 : 1.33333;
 ---
@@ -55,6 +56,12 @@ const strokeWidth = large ? 1.66667 : 1.33333;
     <>
       <path d="M10 15.8333L4.16667 10L10 4.16667" />
       <path d="M15.8333 10H4.16667" />
+    </>
+  )}
+  {name === 'arrow-right' && (
+    <>
+      <path d="M10 4.16667L15.8333 10L10 15.8333" />
+      <path d="M4.16667 10H15.8333" />
     </>
   )}
   {name === 'close' && (

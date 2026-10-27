@@ -1,0 +1,61 @@
+---
+// Web: een landingspagina in een browser. De pagina bouwt op, de cursor klikt de CTA en
+// die gaat naar zijn successtaat.
+import Cursor from './Cursor.astro';
+---
+
+<div class="demo" data-demo>
+  <div class="demo-sheet">
+    <div class="dw-bar">
+      <span class="dw-dot"></span>
+      <span class="dw-dot"></span>
+      <span class="dw-dot"></span>
+      <span class="dw-url"></span>
+    </div>
+    <div class="dw-page">
+      <div class="dw-nav dw-in" style="--i: 0">
+        <span class="dw-logo">Nova</span>
+        <span class="dw-links">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </div>
+      <div class="dw-hero">
+        <p class="dw-h dw-in" style="--i: 1">
+          Plan je week in vijf minuten.
+        </p>
+        <p class="dw-s dw-in" style="--i: 2">
+          Eén overzicht voor je hele team.
+        </p>
+        <div class="dw-in" style="--i: 3">
+          <span class="dw-cta demo-target">
+            <span class="demo-swap">
+              <span class="demo-a">Meld je aan</span>
+              <span class="demo-b dw-done">
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3.5 8.5l3 3 6-7" />
+                </svg>
+                Aangemeld
+              </span>
+            </span>
+            <Cursor />
+          </span>
+        </div>
+      </div>
+      <div class="dw-tiles dw-in" style="--i: 4">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+</div>

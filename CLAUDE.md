@@ -27,7 +27,7 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 - Inter 4 staat op `font-optical-sizing: none`, anders is grote tekst smaller dan in Figma.
 - `BaseLayout` heeft de props `title`, `description` en `noindex`, plus een slot `head`. `NavPill` en `ContactDrawer` staan al in de layout; pagina's plaatsen ze niet zelf.
 - Elk element met het attribuut `data-open-contact` opent de contact-drawer.
-- Avatar en contactillustratie zijn SVG's die met `scripts/illustrations/trace.py` uit de PNG's getraceerd zijn, in lagen (hoofd, ogen, damp, been). De animatie-CSS zit in de SVG en begint met de blik naar de bezoeker. De avatar is een `<img>` met via `<picture>` een `-static.svg` bij reduced motion; de contactillustratie staat inline, zodat de animatie bij elk openen van de drawer opnieuw begint. Pas de animatie aan in `scripts/illustrations/*.css` en draai het script opnieuw; bewerk de SVG's niet met de hand. `avatar.png` blijft de bron, ook voor de OG-afbeelding.
+- Avatar, contactillustratie en de illustratie op "Over" zijn SVG's die met `scripts/illustrations/trace.py` uit de PNG's getraceerd zijn, in lagen (hoofd, ogen, damp, been). De animatie-CSS zit in de SVG en begint met de blik naar de bezoeker. De avatar is een `<img>` met via `<picture>` een `-static.svg` bij reduced motion; de contactillustratie staat inline, zodat de animatie bij elk openen van de drawer opnieuw begint. Pas de animatie aan in `scripts/illustrations/*.css` en draai het script opnieuw; bewerk de SVG's niet met de hand. `avatar.png` blijft de bron, ook voor de OG-afbeelding.
 - Screenshots in parallelle worktrees: draai `scratchpad/shot.sh` van de orchestrator (een lock op poort 4329), niet `pnpm screenshot` direct.
 
 ## Ontwerpbeslissingen (Jesse, 2026-10-25)
@@ -39,16 +39,17 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 - **Case:** de titel staat altijd gecentreerd ten opzichte van de viewport. De meta-kolom loopt van de linkerkant van de titel tot de rechterrand van de container.
 - Tekstblok: volle breedte, links uitgelijnd, 16px van de rand.
 - Kleur is in te stellen per blok (`color`). De kleur van de hero is ook de kleur van het paneel op Home.
-- De knop Expertise linkt naar `/over#expertise`, het persoonsicoon in de nav naar `/over`.
+- De knop Expertise linkt naar `/over#diensten`, het persoonsicoon in de nav naar `/over`.
 - Drawer op mobiel (onder `lg`): een pull-up panel over de volle breedte, vast aan de onderkant, radius 32 bovenaan, met grip en 20% zwarte waas. Omlaag vegen sluit hem.
 - Geen eindeloze lus op touch (2026-10-25): op iOS Safari ging er te veel mis. De lus staat alleen aan bij `pointer: fine`.
 
 ## Pagina "Over" (Jesse, 2026-10-27)
 
-- Geen Figma-ontwerp; direct gebouwd. Inhoud in `src/content/about/<taal>.yml` (Pages CMS: "Over").
-- Extreem korte tekst: intro met statusregel (beschikbaarheid en lokale tijd), drie expertisekaarten zoals de inspiratie (Product Design, Landingspagina's & merkwebsites, Brand Design), en "Gewerkt voor" met logo's. Geen quote.
-- De pil op een expertisekaart drijft langzaam; bij hover volgt het licht de cursor (alleen `pointer: fine`, niet bij reduced motion).
-- Logo's staan in één grijstint en op gelijke oppervlakte. Zonder logo staat de naam er als tekst.
+- Een gecentreerde marketingpagina in de grammatica van de case-pagina (container 1026, blokken 5:3 en 4:5, meta als `Label:` met waarde, de hoofdstuk-indicator). Geen Figma-ontwerp; direct gebouwd. Inhoud in `src/content/about/<taal>.yml` (Pages CMS: "Over").
+- Volgorde: kop met belofte en klanten (namen als tekst, ze linken naar de case), diensten, werkwijze, over mij, slot "Schuif aan." met de contactillustratie (de lege kruk is de uitnodiging).
+- Alleen per project. Geen beloftes zoals een reactietijd of een gratis kennismaking.
+- De signatuur zijn drie levende UI-fragmenten in de dienstkaarten (`src/components/about/demos/`, `src/styles/demos.css`, `src/scripts/demos.ts`): opbouwen, de cursor van de site klikt een bediening, het fragment reageert. Eén keer in beeld, opnieuw bij hover of tik; bij reduced motion de eindstaat. Geen scroll-reveals elders: de rest van de site heeft die ook niet.
+- De illustratie bij "Over mij" (`src/assets/about/illustration.png`, getraceerd met `scripts/illustrations/about.json`) is nog niet geanimeerd; Jesse twijfelt nog.
 
 ## Toegankelijkheid
 

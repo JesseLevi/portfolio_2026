@@ -1,0 +1,45 @@
+---
+// Merk: een beeldmerk bouwt zich op uit vier vormen; de cursor kiest een andere accentkleur
+// en het merk kleurt mee.
+import Cursor from './Cursor.astro';
+
+const accentA = '#ff6b3d';
+const accentB = '#3d6bff';
+const swatches = [
+  { color: '#000000' },
+  { color: accentA, was: true },
+  { color: accentB, target: true },
+  { color: '#f2f2f2' },
+];
+---
+
+<div
+  class="demo"
+  data-demo
+  style={`--accent-a: ${accentA}; --accent-b: ${accentB}`}
+>
+  <div class="demo-sheet db">
+    <div class="demo-label">Huisstijl</div>
+    <div class="db-main">
+      <div class="db-mark">
+        {[0, 1, 2, 3].map((i) => (
+          <span class="db-shape" style={`--i: ${i}`} />
+        ))}
+      </div>
+      <div class="db-type">
+        <span class="db-aa">Aa</span>
+        <span class="db-name">Inter Medium</span>
+      </div>
+    </div>
+    <div class="db-swatches">
+      {swatches.map(({ color, was, target }, i) => (
+        <span
+          class:list={['db-swatch', was && 'db-was', target && 'demo-target']}
+          style={`--c: ${color}; --i: ${i}`}
+        >
+          {target && <Cursor />}
+        </span>
+      ))}
+    </div>
+  </div>
+</div>
