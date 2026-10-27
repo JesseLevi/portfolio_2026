@@ -23,7 +23,7 @@ services:
         - Beeldmerk
         - Kleur en typografie
         - Huisstijlgids
-      color: '#cfe8da'
+      color: "#cfe8da"
       demo: brand
     - title: Landingspagina's & merkwebsites
       body: Pagina's die je product snel uitleggen en bezoekers tot actie brengen.
@@ -31,16 +31,15 @@ services:
         - Structuur
         - Responsive ontwerp
         - Overdracht aan development
-      color: '#ffe3cf'
+      color: "#ffe3cf"
       demo: web
     - title: Product design
       body: UX/UI voor dashboards en webapps. Minder verwarring, sneller resultaat.
       deliverables:
         - Flows en wireframes
         - UI-ontwerp
-        - Prototype
         - Design system
-      color: '#c9dde6'
+      color: "#c9dde6"
       demo: product
 process:
   title: Mijn werkwijze
