@@ -9,6 +9,12 @@ media:
     input: src/assets/cases
     output: ../../../assets/cases
     categories: [image]
+  # Logo's op de pagina "Over". Het pad is relatief aan src/content/about/<taal>.yml.
+  - name: logos
+    label: Klantlogo's
+    input: src/assets/clients
+    output: ../../assets/clients
+    categories: [image]
 
 content:
   - name: about-nl
@@ -111,31 +117,34 @@ content:
                 label: Tekst
                 type: string
                 required: true
-      - name: about
-        label: Over mij
+      - name: work
+        label: Werk
         type: object
         fields:
           - name: title
             label: Kop
             type: string
             required: true
-          - name: body
-            label: Tekst
-            type: text
+          - name: cta
+            label: Knop naar Home
+            type: string
             required: true
-          - name: facts
-            label: Feiten
+          - name: items
+            label: Kaarten
             type: object
             list: true
             fields:
-              - name: label
-                label: Label (met dubbele punt)
+              - name: case
+                label: Case (slug)
                 type: string
                 required: true
-              - name: value
-                label: Waarde
+              - name: tagline
+                label: Omschrijving (kort)
                 type: string
-                required: true
+              - name: logo
+                label: Logo (SVG of PNG, wordt wit; zonder logo staat de naam er)
+                type: image
+                media: logos
       - name: closing
         label: Slot
         type: object

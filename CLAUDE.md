@@ -27,7 +27,7 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 - Inter 4 staat op `font-optical-sizing: none`, anders is grote tekst smaller dan in Figma.
 - `BaseLayout` heeft de props `title`, `description` en `noindex`, plus een slot `head`. `NavPill` en `ContactDrawer` staan al in de layout; pagina's plaatsen ze niet zelf.
 - Elk element met het attribuut `data-open-contact` opent de contact-drawer.
-- Avatar, contactillustratie en de illustratie op "Over" zijn SVG's die met `scripts/illustrations/trace.py` uit de PNG's getraceerd zijn, in lagen (hoofd, ogen, damp, been). De animatie-CSS zit in de SVG en begint met de blik naar de bezoeker. De avatar is een `<img>` met via `<picture>` een `-static.svg` bij reduced motion; de contactillustratie staat inline, zodat de animatie bij elk openen van de drawer opnieuw begint. Pas de animatie aan in `scripts/illustrations/*.css` en draai het script opnieuw; bewerk de SVG's niet met de hand. `avatar.png` blijft de bron, ook voor de OG-afbeelding.
+- Avatar en contactillustratie zijn SVG's die met `scripts/illustrations/trace.py` uit de PNG's getraceerd zijn, in lagen (hoofd, ogen, damp, been). De animatie-CSS zit in de SVG en begint met de blik naar de bezoeker. De avatar is een `<img>` met via `<picture>` een `-static.svg` bij reduced motion; de contactillustratie staat inline, zodat de animatie bij elk openen van de drawer opnieuw begint. Pas de animatie aan in `scripts/illustrations/*.css` en draai het script opnieuw; bewerk de SVG's niet met de hand. `avatar.png` blijft de bron, ook voor de OG-afbeelding.
 - Screenshots in parallelle worktrees: draai `scratchpad/shot.sh` van de orchestrator (een lock op poort 4329), niet `pnpm screenshot` direct.
 
 ## Ontwerpbeslissingen (Jesse, 2026-10-25)
@@ -45,11 +45,12 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 
 ## Pagina "Over" (Jesse, 2026-10-27)
 
-- Een gecentreerde marketingpagina in de grammatica van de case-pagina (container 1026, blokken 5:3 en 4:5, meta als `Label:` met waarde, de hoofdstuk-indicator). Geen Figma-ontwerp; direct gebouwd. Inhoud in `src/content/about/<taal>.yml` (Pages CMS: "Over").
-- Volgorde: kop met belofte en klanten (namen als tekst, ze linken naar de case), diensten, werkwijze, over mij, slot "Schuif aan." met de contactillustratie (de lege kruk is de uitnodiging).
-- Alleen per project. Geen beloftes zoals een reactietijd of een gratis kennismaking.
-- De signatuur zijn drie levende UI-fragmenten in de dienstkaarten (`src/components/about/demos/`, `src/styles/demos.css`, `src/scripts/demos.ts`): opbouwen, de cursor van de site klikt een bediening, het fragment reageert. Eén keer in beeld, opnieuw bij hover of tik; bij reduced motion de eindstaat. Geen scroll-reveals elders: de rest van de site heeft die ook niet.
-- De illustratie bij "Over mij" (`src/assets/about/illustration.png`, getraceerd met `scripts/illustrations/about.json`) is nog niet geanimeerd; Jesse twijfelt nog.
+- Een gecentreerde marketingpagina in de grammatica van de case-pagina (container 1026, blokken 5:3 en 4:5, de hoofdstuk-indicator). Geen Figma-ontwerp; direct gebouwd. Inhoud in `src/content/about/<taal>.yml` (Pages CMS: "Over").
+- Volgorde: kop met belofte en klanten (namen als tekst, ze linken naar de case), diensten (brand, landing, product), "Mijn werkwijze", "Geselecteerd werk", slot "Schuif aan." met de contactillustratie (de lege kruk is de uitnodiging).
+- Bij het laden komen de elementen t/m de fold één voor één binnen (CSS, `.enter` in `over.astro`). Verder geen scroll-reveals: de rest van de site heeft die ook niet.
+- Alleen per project. Geen beloftes zoals een reactietijd of een gratis kennismaking. Geen cv-feiten (stages, werkgevers).
+- De dienstkaarten hebben levende UI-fragmenten (`src/components/about/demos/`, `src/styles/demos.css`, `src/scripts/demos.ts`): opbouwen, de cursor van de site klikt een bediening, het fragment reageert. Eén keer in beeld, opnieuw bij hover of tik; bij reduced motion de eindstaat.
+- "Geselecteerd werk" (naar Marvin Schwaibold): kaarten in 4:5 met de hero van de case sterk vervaagd als achtergrond, een donkere shade van onderen en het logo wit met een zachte schaduw. Zonder logo staat de naam er als woordmerk. Logo's in `src/assets/clients/`.
 
 ## Toegankelijkheid
 

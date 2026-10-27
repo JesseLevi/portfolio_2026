@@ -8,6 +8,22 @@ import AxeBuilder from '@axe-core/playwright';
 const MUTED = '#949494';
 
 async function scan(page: Page) {
+  // Wacht op de eindstaat: entree-animaties maken tekst kort lichter dan hij is. Alleen
+  // lopende, eindige animaties op de gewone tijdlijn: oneindige (de pulserende statusstip) en
+  // scroll-gestuurde (de veil van de lus op Home) raken nooit klaar.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter(
+          (a) =>
+            a.playState === 'running' &&
+            a.timeline === document.timeline &&
+            a.effect?.getComputedTiming().endTime !== Infinity,
+        )
+        .map((a) => a.finished),
+    ),
+  );
   const { violations } = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'])
     .analyze();

@@ -31,12 +31,10 @@ export const nl = {
     'Jesse Kamps ontwerpt producten, websites en merken. Per project, van eerste schets tot bouwklaar ontwerp.',
   'about.work': 'Bekijk werk',
   'about.deliverables': 'Wat je krijgt',
-  'about.illustration':
-    'Illustratie van Jesse aan zijn bureau, schetsend naast een scherm met een website.',
   'about.chapter.intro': 'Intro',
   'about.chapter.services': 'Diensten',
   'about.chapter.process': 'Werkwijze',
-  'about.chapter.about': 'Over mij',
+  'about.chapter.work': 'Werk',
   'about.chapter.contact': 'Contact',
   // 404
   'notFound.title': 'Pagina niet gevonden',

@@ -1,0 +1,87 @@
+---
+// Kaart naar een case op de pagina "Over". Achtergrond: de hero van de case, sterk vervaagd
+// (de kleur van het werk, niet het detail), met een donkere shade van onderen voor de tekst.
+// Het logo staat er wit op, met een zachte schaduw; zonder logo de naam als woordmerk.
+import { Image } from 'astro:assets';
+import Icon from '../Icon.astro';
+import type { CaseEntry } from '../../lib/cases';
+import type { WorkItem } from '../../lib/about';
+
+interface Props {
+  entry: CaseEntry;
+  item: WorkItem;
+}
+
+const { entry, item } = Astro.props;
+const { title, slug, hero } = entry.data;
+const { logo, tagline } = item;
+
+// Elk logo dezelfde oppervlakte (px²): een breed woordmerk oogt dan niet groter dan een compact logo.
+const AREA = 3600;
+const size = logo && {
+  width: Math.round(Math.sqrt(AREA * (logo.width / logo.height))),
+  height: Math.round(Math.sqrt(AREA / (logo.width / logo.height))),
+};
+---
+
+<li class="w-[72vw] shrink-0 snap-start md:w-[clamp(220px,calc((100%-2rem)/5),280px)]">
+  <a
+    href={`/werk/${slug}`}
+    class="group focus-visible:outline-ink relative flex aspect-4/5 flex-col justify-end overflow-hidden rounded-lg p-4 focus-visible:outline-2 focus-visible:outline-offset-2 md:rounded-2xl md:p-5"
+    style={{ backgroundColor: hero.color }}
+  >
+    <Image
+      src={hero.image}
+      alt=""
+      width={480}
+      loading="lazy"
+      class="absolute inset-0 size-full scale-125 object-cover blur-xl saturate-150 transition-transform duration-700 ease-(--vt-ease) group-hover:scale-[1.35]"
+    />
+    <span class="shade absolute inset-0" aria-hidden="true"></span>
+
+    <span
+      class="absolute inset-0 flex items-center justify-center transition-transform duration-500 ease-(--vt-ease) group-hover:-translate-y-1"
+      aria-hidden="true"
+    >
+      {logo && size ? (
+        <Image src={logo} alt="" {...size} class="logo" />
+      ) : (
+        <span class="wordmark text-title-xs text-paper font-semibold">
+          {title}
+        </span>
+      )}
+    </span>
+
+    <span class="text-paper relative flex items-end justify-between gap-3">
+      <span class="text-body">
+        <span class="block">{title}</span>
+        {tagline && <span class="text-paper/70 block">{tagline}</span>}
+      </span>
+      <Icon
+        name="arrow-right"
+        size={16}
+        class="mb-1 shrink-0 opacity-70 transition-[translate,opacity] duration-300 group-hover:translate-x-0.5 group-hover:opacity-100"
+      />
+    </span>
+  </a>
+</li>
+
+<style>
+  .shade {
+    background:
+      linear-gradient(to top, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0) 55%),
+      rgb(0 0 0 / 0.12);
+  }
+
+  /* De schaduw onder het witte logo: het "zweeft" als een sticker boven het beeld. */
+  .logo {
+    filter: brightness(0) invert(1) drop-shadow(0 2px 3px rgb(0 0 0 / 0.18))
+      drop-shadow(0 10px 24px rgb(0 0 0 / 0.28));
+  }
+  .wordmark {
+    letter-spacing: -0.02em;
+    text-shadow:
+      0 2px 3px rgb(0 0 0 / 0.18),
+      0 10px 24px rgb(0 0 0 / 0.28);
+  }
+</style>

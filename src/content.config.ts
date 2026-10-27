@@ -76,7 +76,7 @@ const about = defineCollection({
     base: './src/content/about',
     generateId: ({ entry }) => entry.replace(/\.yml$/, ''),
   }),
-  schema: () => {
+  schema: ({ image }) => {
     const text = z.object({ title: z.string(), body: z.string() });
 
     return z.object({
@@ -107,10 +107,18 @@ const about = defineCollection({
         ),
       }),
       process: z.object({ title: z.string(), steps: z.array(text) }),
-      about: z.object({
+      // Kaarten naar het werk: de hero van de case (vervaagd) met het logo erop.
+      work: z.object({
         title: z.string(),
-        body: z.string(),
-        facts: z.array(z.object({ label: z.string(), value: z.string() })),
+        cta: z.string(),
+        items: z.array(
+          z.object({
+            case: z.string(),
+            tagline: z.string().optional(),
+            // Zonder logo staat de naam van de case er als woordmerk.
+            logo: image().optional(),
+          }),
+        ),
       }),
       closing: text,
     });
