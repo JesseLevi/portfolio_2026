@@ -7,19 +7,32 @@ import type { IconName } from './Icon.astro';
 import { getLocale, t } from '../i18n';
 
 const locale = getLocale(Astro.currentLocale);
-// `aria-current="page"` alleen op Home zelf; de nav blijft staan tussen pagina's
+// `aria-current="page"` alleen op de pagina zelf; de nav blijft staan tussen pagina's
 // (transition:persist), dus nav-pill.ts werkt het bij op astro:page-load.
-const onHome = Astro.url.pathname === '/';
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const current = path === '/' ? 'home' : path === '/over' ? 'about' : null;
 
-// `Over` linkt voorlopig nergens heen (pagina komt later): <span>, wel met hover-cirkel.
 const items: {
   id: 'home' | 'about' | 'contact';
   icon: IconName;
   label: string;
-  tag: 'a' | 'span' | 'button';
+  tag: 'a' | 'button';
+  href?: string;
 }[] = [
-  { id: 'home', icon: 'home', label: t('nav.home', locale), tag: 'a' },
-  { id: 'about', icon: 'person', label: t('nav.about', locale), tag: 'span' },
+  {
+    id: 'home',
+    icon: 'home',
+    label: t('nav.home', locale),
+    tag: 'a',
+    href: '/',
+  },
+  {
+    id: 'about',
+    icon: 'person',
+    label: t('nav.about', locale),
+    tag: 'a',
+    href: '/over',
+  },
   {
     id: 'contact',
     icon: 'send',
@@ -40,19 +53,19 @@ const items: {
     <span
       data-nav-circle
       aria-hidden="true"
-      style={`transform: translateX(8px); opacity: ${onHome ? 1 : 0}`}
+      style={`transform: translateX(8px); opacity: ${current === 'home' ? 1 : 0}`}
       class="bg-pill pointer-events-none absolute top-2 left-0 h-8 w-[78px] rounded-full transition-[transform,width,opacity] duration-300 ease-(--nav-ease) will-change-transform"
     ></span>
     <ul class="flex items-center gap-2">
-      {items.map(({ id, icon, label, tag: Tag }) => {
-        const active = id === 'home' && onHome;
+      {items.map(({ id, icon, label, tag: Tag, href }) => {
+        const active = id === current;
         return (
           <li class="relative z-10">
             <Tag
               data-nav-item={id}
               data-active={active ? 'true' : 'false'}
               {...(Tag === 'a'
-                ? { href: '/', ...(onHome ? { 'aria-current': 'page' } : {}) }
+                ? { href, ...(active ? { 'aria-current': 'page' } : {}) }
                 : {})}
               {...(Tag === 'button'
                 ? { type: 'button', 'data-open-contact': '' }

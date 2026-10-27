@@ -14,10 +14,13 @@ let drawerOpen = false;
 let hovered: Id | null = null;
 let render: (() => void) | null = null;
 
-// Home is alleen actief op `/`; op een case staat geen item aan, zodat Home een
-// gewone link terug is (Figma 6166:24666).
-const activeId = (): Id | null =>
-  drawerOpen ? 'contact' : location.pathname === '/' ? 'home' : null;
+// Home is alleen actief op `/`, Over op `/over`; op een case staat geen item aan,
+// zodat Home een gewone link terug is (Figma 6166:24666).
+const pageId = (): Id | null => {
+  const path = location.pathname.replace(/\/$/, '') || '/';
+  return path === '/' ? 'home' : path === '/over' ? 'about' : null;
+};
+const activeId = (): Id | null => (drawerOpen ? 'contact' : pageId());
 
 function setup(nav: HTMLElement) {
   const circle = nav.querySelector<HTMLElement>('[data-nav-circle]')!;
@@ -64,7 +67,7 @@ function setup(nav: HTMLElement) {
       const id = el.dataset.navItem;
       const on = id === active;
       el.dataset.active = String(on);
-      if (id === 'home') {
+      if (id === 'home' || id === 'about') {
         if (on) el.setAttribute('aria-current', 'page');
         else el.removeAttribute('aria-current');
       } else if (id === 'contact') {

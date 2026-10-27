@@ -16,14 +16,14 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 - Bestand `TXNyd3UorTlXBoZJnFutXm`, pagina "Exploration". Sectie Home `6169:28410`, sectie Case `6169:28409`.
 - Lees het bestand via de `figma-console`-bridge (`figma_get_status` met `probe: true`, daarna `figma_execute`). **Meet waarden in de nodes** (padding, gap, fontSize, fills, effects). Lees ze niet af van een screenshot.
 - De annotaties (`node.annotations`) zijn de spec voor gedrag.
-- De frame "About" (`6169:27104`) is eigenlijk de **mobiele case-pagina**. Een pagina "Over" is nog niet ontworpen.
+- De frame "About" (`6169:27104`) is eigenlijk de **mobiele case-pagina**. De pagina "Over" heeft geen Figma-frame: die is direct in code gebouwd (2026-10-27).
 - De mockups in de frames worden op de site gewone afbeeldingen.
 - **De Figma wordt nog bijgewerkt en gaat altijd voor.** Meet bij elk ticket opnieuw; maten in issues kunnen verouderd zijn (de avatar-ring is bijvoorbeeld `#f2f2f2` geworden).
 
 ## Afspraken in de code
 
 - Live: https://jessekamps.vercel.app (Vercel-project `portfolio-2026`). De automatisch gegenereerde `*.vercel.app`-URL's per deploy zitten achter Vercel-authenticatie.
-- Routes: Home `/`, case `/werk/<slug>`. Engels later onder `/en/...`.
+- Routes: Home `/`, case `/werk/<slug>`, Over `/over`. Engels later onder `/en/...`.
 - Inter 4 staat op `font-optical-sizing: none`, anders is grote tekst smaller dan in Figma.
 - `BaseLayout` heeft de props `title`, `description` en `noindex`, plus een slot `head`. `NavPill` en `ContactDrawer` staan al in de layout; pagina's plaatsen ze niet zelf.
 - Elk element met het attribuut `data-open-contact` opent de contact-drawer.
@@ -39,9 +39,16 @@ Portfolio van Jesse Kamps, gebouwd vanuit Figma. Stand van zaken: `docs/HANDOFF.
 - **Case:** de titel staat altijd gecentreerd ten opzichte van de viewport. De meta-kolom loopt van de linkerkant van de titel tot de rechterrand van de container.
 - Tekstblok: volle breedte, links uitgelijnd, 16px van de rand.
 - Kleur is in te stellen per blok (`color`). De kleur van de hero is ook de kleur van het paneel op Home.
-- De knop Expertise en het persoonsicoon in de nav linken voorlopig nergens heen; de pagina "Over" komt later.
+- De knop Expertise linkt naar `/over#expertise`, het persoonsicoon in de nav naar `/over`.
 - Drawer op mobiel (onder `lg`): een pull-up panel over de volle breedte, vast aan de onderkant, radius 32 bovenaan, met grip en 20% zwarte waas. Omlaag vegen sluit hem.
 - Geen eindeloze lus op touch (2026-10-25): op iOS Safari ging er te veel mis. De lus staat alleen aan bij `pointer: fine`.
+
+## Pagina "Over" (Jesse, 2026-10-27)
+
+- Geen Figma-ontwerp; direct gebouwd. Inhoud in `src/content/about/<taal>.yml` (Pages CMS: "Over").
+- Extreem korte tekst: intro met statusregel (beschikbaarheid en lokale tijd), drie expertisekaarten zoals de inspiratie (Product Design, Landingspagina's & merkwebsites, Brand Design), en "Gewerkt voor" met logo's. Geen quote.
+- De pil op een expertisekaart drijft langzaam; bij hover volgt het licht de cursor (alleen `pointer: fine`, niet bij reduced motion).
+- Logo's staan in één grijstint en op gelijke oppervlakte. Zonder logo staat de naam er als tekst.
 
 ## Toegankelijkheid
 

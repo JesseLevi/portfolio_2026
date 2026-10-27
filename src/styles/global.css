@@ -11,6 +11,8 @@
   --color-rule: #dedede;
   --color-faint: #e1e1e1;
   --color-ring: #f2f2f2;
+  /* Statusstip op de pagina "Over". */
+  --color-available: #34c759;
 
   /* --font-inter komt van de Astro fonts API (astro.config.mjs), incl. fallbacks. */
   --font-sans: var(--font-inter), system-ui, sans-serif;

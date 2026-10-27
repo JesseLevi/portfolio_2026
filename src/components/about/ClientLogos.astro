@@ -1,0 +1,40 @@
+---
+// Logo's in één grijstint (#949494), ongeacht de kleuren van het bestand: zwart maken,
+// dan 42% dekking op wit. Zonder logo staat de naam er als tekst.
+// Elk logo krijgt dezelfde oppervlakte (AREA px²), zodat een breed woordmerk niet
+// groter oogt dan een compact logo: hoogte = √(AREA / verhouding).
+import { Image } from 'astro:assets';
+import type { Client } from '../../lib/about';
+
+interface Props {
+  clients: Client[];
+}
+
+const { clients } = Astro.props;
+const AREA = 1800;
+
+const size = ({ width, height }: { width: number; height: number }) => {
+  const ratio = width / height;
+  return {
+    width: Math.round(Math.sqrt(AREA * ratio)),
+    height: Math.round(Math.sqrt(AREA / ratio)),
+  };
+};
+---
+
+<ul class="flex flex-wrap items-center gap-x-12 gap-y-8">
+  {clients.map(({ name, logo }) => (
+    <li class="flex h-6 items-center">
+      {logo ? (
+        <Image
+          src={logo}
+          alt={name}
+          {...size(logo)}
+          class="opacity-42 brightness-0"
+        />
+      ) : (
+        <span class="text-body text-muted font-semibold">{name}</span>
+      )}
+    </li>
+  ))}
+</ul>

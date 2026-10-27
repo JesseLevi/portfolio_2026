@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Avatar from '../components/Avatar.astro';
+import Button from '../components/Button.astro';
+import ServiceCard from '../components/about/ServiceCard.astro';
+import ClientLogos from '../components/about/ClientLogos.astro';
+import { getAbout } from '../lib/about';
+import { getLocale, t } from '../i18n';
+
+const locale = getLocale(Astro.currentLocale);
+const about = await getAbout(locale);
+const localTime = t('about.localTime', locale).replace('{city}', about.city);
+---
+
+<BaseLayout
+  title={t('about.title', locale)}
+  description={t('about.description', locale)}
+>
+  <!-- Eén kolom: intro, expertise, klanten. De onderruimte houdt de nav-pil vrij. -->
+  <main class="mx-auto flex max-w-[1032px] flex-col gap-20 px-6 pt-24 pb-40 lg:gap-24 lg:pt-32">
+    <section class="flex flex-col items-start gap-4">
+      <Avatar />
+      <div class="flex flex-col items-start gap-6">
+        <div class="text-heading flex flex-col gap-1.5">
+          <h1>{t('site.name', locale)}</h1>
+          <p class="text-muted">{t('site.role', locale)}</p>
+        </div>
+        <!-- Status: beschikbaarheid, plus de lokale tijd zodra het script draait (src/scripts/about.ts). -->
+        <p class="text-label text-muted flex items-center gap-2">
+          <span class="relative flex size-2" aria-hidden="true">
+            <span class="bg-available absolute inset-0 animate-ping rounded-full opacity-60"></span>
+            <span class="bg-available relative size-2 rounded-full"></span>
+          </span>
+          <span>
+            {about.availability}
+            <span data-local-time data-template={localTime} hidden></span>
+          </span>
+        </p>
+        <Button variant="primary" icon="send" data-open-contact>
+          {t('cta.contact', locale)}
+        </Button>
+      </div>
+    </section>
+
+    <section
+      id="expertise"
+      aria-labelledby="expertise-title"
+      class="flex scroll-mt-24 flex-col gap-4"
+    >
+      <h2 id="expertise-title" class="text-body text-muted">
+        {t('about.expertise', locale)}
+      </h2>
+      <!-- Mobiel een rij om door te vegen (snap per kaart), vanaf `md` drie kolommen. -->
+      <ul
+        tabindex="0"
+        aria-labelledby="expertise-title"
+        class="focus-visible:outline-ink -mx-6 flex snap-x snap-mandatory scroll-px-6 gap-3 overflow-x-auto px-6 [scrollbar-width:none] focus-visible:outline-2 focus-visible:-outline-offset-2 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0"
+      >
+        {about.services.map((service, index) => (
+          <ServiceCard service={service} index={index} />
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="clients-title" class="flex flex-col gap-6">
+      <h2 id="clients-title" class="text-body text-muted">
+        {t('about.clients', locale)}
+      </h2>
+      <ClientLogos clients={about.clients} />
+    </section>
+  </main>
+</BaseLayout>
+
+<script>
+  import '../scripts/about.ts';
+</script>

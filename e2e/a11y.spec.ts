@@ -46,6 +46,7 @@ async function expectStructure(page: Page) {
 const pages = [
   { name: 'home', url: '/' },
   { name: 'case', url: '/werk/suitsupply' },
+  { name: 'over', url: '/over' },
   { name: '404', url: '/404' },
 ];
 
