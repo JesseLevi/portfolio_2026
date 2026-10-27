@@ -231,6 +231,13 @@
     animation-duration: 400ms;
     animation-timing-function: ease-out;
   }
+  /*
+   * Home -> case: de intro en de titels van Home verdwijnen snel (150ms),
+   * anders blijven ze lang zichtbaar achter de groeiende hero.
+   */
+  html[data-vt='to-case']::view-transition-old(root) {
+    animation-duration: 150ms;
+  }
   ::view-transition-group(case-block),
   ::view-transition-group(case-shot),
   ::view-transition-group(nav-pill) {
